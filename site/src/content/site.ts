@@ -65,6 +65,8 @@ export const hero = {
       tone: "dark",
       /** Вирівнювання назви напряму на банері. */
       align: "left",
+      /** Вертикальне положення назви на банері. */
+      vAlign: "quarter",
     },
     {
       id: "prasu",
@@ -77,6 +79,7 @@ export const hero = {
       focus: "100% 100%",
       tone: "dark",
       align: "center",
+      vAlign: "center",
     },
   ],
 } as const;

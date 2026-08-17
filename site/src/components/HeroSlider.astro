@@ -69,30 +69,29 @@ const first = hero.slides[0]!;
       {hero.title}
     </h1>
 
-    <!-- Сітка на всю ширину: інакше вирівнювання по лівому краю тягнеться до
-         краю власного вмісту, а не до краю колонки. -->
-    <div class="grid w-full">
-      {
-        hero.slides.map((slide, i) => (
-          <p
-            id={`hero-panel-${slide.id}`}
-            role="tabpanel"
-            aria-labelledby={`hero-tab-${slide.id}`}
-            data-slide={slide.id}
-            data-active={i === 0 ? "" : null}
-            data-tone={slide.tone}
-            class:list={[
-              "hero-copy col-start-1 row-start-1 max-w-[15ch] text-display font-display font-medium tracking-tight",
-              slide.align === "left"
-                ? "justify-self-start text-left"
-                : "justify-self-center text-center",
-            ]}
-          >
-            {slide.title}
-          </p>
-        ))
-      }
-    </div>
+    <!-- Назви позиціонуються абсолютно: у кожного напряму своє місце на банері,
+         і зі спільним потоком двох підписів одночасно це не зробити. -->
+    {
+      hero.slides.map((slide, i) => (
+        <p
+          id={`hero-panel-${slide.id}`}
+          role="tabpanel"
+          aria-labelledby={`hero-tab-${slide.id}`}
+          data-slide={slide.id}
+          data-active={i === 0 ? "" : null}
+          data-tone={slide.tone}
+          class:list={[
+            "hero-copy absolute max-w-[15ch] text-display font-display font-medium tracking-tight",
+            slide.align === "left"
+              ? "left-5 text-left sm:left-8"
+              : "left-1/2 -translate-x-1/2 text-center",
+            slide.vAlign === "quarter" ? "top-[25%]" : "top-1/2 -translate-y-1/2",
+          ]}
+        >
+          {slide.title}
+        </p>
+      ))
+    }
   </div>
 
   <!-- Керування по центру: вкладки й кнопка в одному рядку -->
