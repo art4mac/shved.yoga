@@ -11,3 +11,14 @@ node_modules/
 site/dist/
 site/.astro/
 npm-debug.log*
+
+# Оригінали знімків від клієнта: 248 МБ, і репозиторій публічний.
+# Слеш на початку обовʼязковий: без нього правило ловить будь-яку теку
+# з такою назвою, у т.ч. site/src/assets/photos, з якої збирається сайт.
+# Збірці вони не потрібні — вона бере похідні кадри з site/src/assets/photos/.
+/photos/
+
+# Сторонні скіли встановлюються з skills-lock.json командою
+# `npx skills experimental_install`, тому самі теки не комітимо.
+.agents/
+.claude/skills/
