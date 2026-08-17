@@ -1,0 +1,361 @@
+---
+import { Image } from "astro:assets";
+import { hero, bot } from "../content/site";
+
+import hathaHero from "../assets/photos/hatha-hero.png";
+import prasuHero from "../assets/photos/prasu-hero.png";
+
+/**
+ * Слайдер напрямів.
+ *
+ * Паперової панелі більше немає: на банері лежать тільки два тексти — постійний
+ * заголовок і назва напряму, прямо поверх фото. Тло слайдів різне (світле й
+ * темне), тому колір тексту перемикається разом із кадром через `data-tone`;
+ * під текстом лежить м'яка пелена того ж тону, бо на світлому одязі й білий, і
+ * чорнильний текст однаково провалюються.
+ *
+ * Керування стоїть по центру, поруч із ним кнопка: її підпис і посилання
+ * змінюються разом зі слайдом.
+ *
+ * Кадри беруться цілими, рамку задає лише `object-fit`.
+ */
+const sources: Record<string, ImageMetadata> = {
+  hatha: hathaHero,
+  prasu: prasuHero,
+};
+
+const first = hero.slides[0]!;
+---
+
+<section
+  class="relative isolate overflow-hidden bg-greige"
+  data-slider
+  data-tone={first.tone}
+  aria-roledescription="слайдер напрямів"
+>
+  <!-- Шар знімків -->
+  {
+    hero.slides.map((slide, i) => (
+      <div
+        data-media={slide.id}
+        data-active={i === 0 ? "" : null}
+        aria-hidden="true"
+        class="absolute inset-0"
+      >
+        <Image
+          src={sources[slide.id]!}
+          alt=""
+          widths={[900, 1400, 1920, 2560]}
+          sizes="100vw"
+          format="avif"
+          loading={i === 0 ? "eager" : "lazy"}
+          decoding={i === 0 ? "sync" : "async"}
+          style={`--focus:${slide.focus}`}
+          class="h-full w-full object-cover object-[var(--focus)]"
+        />
+      </div>
+    ))
+  }
+
+  <!-- Тексти. Тонування кадру знято на прохання замовника, тому читабельність
+       тепер тримається лише на самому знімку — контраст заміряно по пікселях. -->
+  <div
+    class="relative mx-auto flex min-h-[calc(100svh-8.6rem)] max-w-[78rem] flex-col items-center justify-center px-5 pb-28 text-center sm:min-h-[calc(100svh-7.35rem)] sm:px-8"
+  >
+    <!-- Постійний рядок — по верху банера, в один рядок, капітеллю -->
+    <h1
+      class="hero-lead absolute inset-x-5 top-8 text-center font-sans text-[0.625rem] font-medium uppercase tracking-[0.2em] sm:inset-x-8 sm:top-10 sm:text-[0.8125rem]"
+    >
+      {hero.title}
+    </h1>
+
+    <!-- Сітка на всю ширину: інакше вирівнювання по лівому краю тягнеться до
+         краю власного вмісту, а не до краю колонки. -->
+    <div class="grid w-full">
+      {
+        hero.slides.map((slide, i) => (
+          <p
+            id={`hero-panel-${slide.id}`}
+            role="tabpanel"
+            aria-labelledby={`hero-tab-${slide.id}`}
+            data-slide={slide.id}
+            data-active={i === 0 ? "" : null}
+            data-tone={slide.tone}
+            class:list={[
+              "hero-copy col-start-1 row-start-1 max-w-[15ch] text-display font-display font-medium tracking-tight",
+              slide.align === "left"
+                ? "justify-self-start text-left"
+                : "justify-self-center text-center",
+            ]}
+          >
+            {slide.title}
+          </p>
+        ))
+      }
+    </div>
+  </div>
+
+  <!-- Керування по центру: вкладки й кнопка в одному рядку -->
+  <div class="absolute inset-x-0 bottom-0 z-10" data-slider-controls hidden>
+    <div
+      class="mx-auto flex max-w-[78rem] flex-wrap items-center justify-center gap-3 px-5 pb-6 sm:px-8 sm:pb-9"
+    >
+      <div
+        role="tablist"
+        aria-label="Оберіть напрям"
+        class="inline-flex divide-x divide-taupe/20 border border-taupe/25 bg-paper"
+      >
+        {
+          hero.slides.map((slide, i) => (
+            <button
+              type="button"
+              id={`hero-tab-${slide.id}`}
+              role="tab"
+              aria-controls={`hero-panel-${slide.id}`}
+              aria-selected={i === 0 ? "true" : "false"}
+              tabindex={i === 0 ? 0 : -1}
+              data-slider-tab={slide.id}
+              class="flex items-baseline gap-2.5 px-5 py-3.5 font-sans text-small text-taupe transition-colors hover:text-ink aria-selected:text-ink aria-selected:shadow-[inset_0_2px_0_0_var(--color-copper)]"
+            >
+              <time class="font-display font-medium">{slide.tabTime}</time>
+              <span>{slide.tab}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <!-- Підпис і посилання кнопки змінює скрипт разом зі слайдом -->
+      <a
+        href={bot(`hero-${first.id}`)}
+        data-slider-cta
+        data-cta={`hero-${first.id}`}
+        data-napriam={first.id}
+        target="_blank"
+        rel="noopener"
+        class="group inline-flex items-center gap-2.5 bg-copper px-6 py-3.5 font-sans text-small font-medium text-paper transition-[color,background-color,translate] duration-200 hover:bg-ink active:translate-y-px"
+      >
+        <span data-slider-cta-label>{first.ctaLabel}</span>
+        <span
+          aria-hidden="true"
+          class="transition-transform duration-200 group-hover:translate-x-1"
+        >
+          &#8594;
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="border-b border-taupe/20 bg-paper">
+  <ul
+    class="mx-auto flex max-w-[78rem] flex-wrap items-center justify-center gap-x-3 gap-y-2 px-5 py-4 text-center font-sans text-[0.6875rem] uppercase tracking-[0.11em] text-taupe sm:px-8 sm:text-eyebrow"
+  >
+    {
+      hero.facts.map((fact, i) => (
+        <li class="flex items-center gap-3">
+          {i > 0 && (
+            <span aria-hidden="true" class="text-taupe/45">
+              &#8226;
+            </span>
+          )}
+          <span>{fact}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  [data-media],
+  [data-slide] {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-media][data-active],
+  [data-slide][data-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  [data-media] img {
+    scale: 1.03;
+    transition: scale 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  [data-media][data-active] img {
+    scale: 1;
+  }
+
+  /* Смуга ліворуч від кадру пофарбована в колір його власної кромки, взятий
+     піпеткою з файлу: інакше на стику фото й тла проходить жорстка вертикальна
+     межа, і вона ріже текст навпіл. */
+  [data-slider][data-tone="light"] {
+    background-color: #7d7374;
+  }
+
+  [data-slider][data-tone="dark"] {
+    background-color: #3d383b;
+  }
+
+  [data-slider] {
+    transition: background-color 520ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Назва напряму несе тон на собі, а не успадковує від секції: інакше під час
+     перехресного затухання кадрів вона миттєво міняла колір, і на півдорозі
+     білий текст лежав на ще видимому світлому фото. */
+  .hero-copy[data-tone="light"] {
+    color: var(--color-ink);
+  }
+
+  .hero-copy[data-tone="dark"] {
+    color: var(--color-paper);
+  }
+
+  /* Постійний рядок один для обох слайдів, тому тон бере від секції.
+     Колір міняється плавно, а скрипт перемикає його в середині затухання. */
+  .hero-lead {
+    transition: color 260ms linear;
+  }
+
+  [data-slider][data-tone="light"] .hero-lead {
+    color: var(--color-ink);
+  }
+
+  [data-slider][data-tone="dark"] .hero-lead {
+    color: var(--color-paper);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-lead {
+      transition: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-media],
+    [data-slide],
+    [data-media] img {
+      transition: none;
+    }
+
+    [data-media] img {
+      scale: 1;
+    }
+  }
+</style>
+
+<script>
+  import { hero, bot } from "../content/site";
+
+  const root = document.querySelector<HTMLElement>("[data-slider]");
+  const controls = root?.querySelector<HTMLElement>("[data-slider-controls]");
+  const tabs = [...(root?.querySelectorAll<HTMLButtonElement>("[data-slider-tab]") ?? [])];
+  const panels = [...(root?.querySelectorAll<HTMLElement>("[data-slide]") ?? [])];
+  const media = [...(root?.querySelectorAll<HTMLElement>("[data-media]") ?? [])];
+  const cta = root?.querySelector<HTMLAnchorElement>("[data-slider-cta]");
+  const ctaLabel = cta?.querySelector<HTMLElement>("[data-slider-cta-label]");
+
+  if (root && controls && cta && ctaLabel && tabs.length > 1 && tabs.length === panels.length) {
+    controls.hidden = false;
+
+    const AUTOPLAY_MS = 7000;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let index = 0;
+    let timer: number | undefined;
+    let userTookOver = false;
+
+    const show = (next: number) => {
+      index = (next + panels.length) % panels.length;
+      const slide = hero.slides[index]!;
+
+      panels.forEach((panel, i) => {
+        const active = i === index;
+        panel.toggleAttribute("data-active", active);
+        panel.inert = !active;
+      });
+      media.forEach((layer, i) => layer.toggleAttribute("data-active", i === index));
+      tabs.forEach((tab, i) => {
+        const active = i === index;
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+        tab.tabIndex = active ? 0 : -1;
+      });
+
+      // Тон секції перемикаємо в середині перехресного затухання, щоб постійний
+      // рядок не міняв колір, поки попередній кадр ще видно.
+      window.setTimeout(() => {
+        root.dataset.tone = slide.tone;
+      }, reduce.matches ? 0 : 260);
+
+      // Кнопка йде за слайдом: і підпис, і посилання, і мітка для аналітики
+      ctaLabel.textContent = slide.ctaLabel;
+      cta.href = bot(`hero-${slide.id}`);
+      cta.dataset.cta = `hero-${slide.id}`;
+      cta.dataset.napriam = slide.id;
+    };
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const start = () => {
+      if (reduce.matches || userTookOver || timer) return;
+      timer = window.setInterval(() => show(index + 1), AUTOPLAY_MS);
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => {
+        userTookOver = true;
+        stop();
+        show(i);
+      });
+      tab.addEventListener("keydown", (event) => {
+        const delta =
+          event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+        if (!delta) return;
+        event.preventDefault();
+        userTookOver = true;
+        stop();
+        show(index + delta);
+        tabs[index]?.focus();
+      });
+    });
+
+    let startX: number | null = null;
+    root.addEventListener(
+      "pointerdown",
+      (event) => {
+        if (event.pointerType === "mouse") return;
+        startX = event.clientX;
+      },
+      { passive: true },
+    );
+    root.addEventListener(
+      "pointerup",
+      (event) => {
+        if (startX === null) return;
+        const dx = event.clientX - startX;
+        startX = null;
+        if (Math.abs(dx) < 48) return;
+        userTookOver = true;
+        stop();
+        show(index + (dx < 0 ? 1 : -1));
+      },
+      { passive: true },
+    );
+
+    root.addEventListener("pointerenter", stop);
+    root.addEventListener("focusin", stop);
+    root.addEventListener("pointerleave", start);
+    document.addEventListener("visibilitychange", () =>
+      document.hidden ? stop() : start(),
+    );
+    reduce.addEventListener("change", () => (reduce.matches ? stop() : start()));
+
+    show(0);
+    start();
+  }
+</script>
