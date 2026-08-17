@@ -1,0 +1,70 @@
+# Стек для Portainer на хості coventpro: dev-shved-yoga.
+# Самодостатній файл, не оверрайд — Portainer тягне рівно один compose із git.
+# Локальний запуск живе в docker-compose.yml і сюда не заглядає.
+#
+# Патерн повторює сусідній клієнтський стек dev-olenapikhulia: one-shot
+# content-sync кладе вміст у хостовий вебрут, nginx віддає його :ro, Traefik
+# публікує через websecure з letsencrypt. Єдина відмінність — content-sync
+# спершу збирає Astro, бо в репозиторії джерело, а не готова статика.
+services:
+  content-sync:
+    build:
+      context: .
+      dockerfile: deploy/Dockerfile
+      args:
+        SITE_URL: ${SITE_URL:-https://shved-yoga.dev.coventpro.ai}
+        PUBLIC_BOT_URL: ${PUBLIC_BOT_URL:-https://t.me/olha_shved_yoga_bot}
+        PUBLIC_GA4_ID: ${PUBLIC_GA4_ID:-}
+    image: dev-shved-yoga-content:latest
+    container_name: dev-shved-yoga-sync
+    restart: "no"
+    volumes:
+      - /var/www/vhosts/shved-yoga.dev.coventpro.ai:/dest
+      - /home/docker/infra/volumes/dev-shved-yoga:/conf
+    command:
+      - sh
+      - -ec
+      - |
+        mkdir -p /dest /conf
+        rsync -a --delete /src/site/ /dest/
+        cp -a /src/nginx.conf /conf/nginx.conf
+        echo "synced git -> /var/www/vhosts/shved-yoga.dev.coventpro.ai"
+
+  dev-shved-yoga:
+    image: nginx:1.27-alpine
+    container_name: dev-shved-yoga
+    restart: unless-stopped
+    depends_on:
+      content-sync:
+        condition: service_completed_successfully
+    networks: [coventit-net]
+    volumes:
+      - /var/www/vhosts/shved-yoga.dev.coventpro.ai:/usr/share/nginx/html:ro
+      - /home/docker/infra/volumes/dev-shved-yoga/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/"]
+      interval: 30s
+      timeout: 3s
+      start_period: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits: {cpus: "0.25", memory: 64M}
+        reservations: {memory: 16M}
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=coventit-net
+
+      # --- HTTPS (websecure) ---
+      - traefik.http.routers.dev-shved-yoga.rule=Host(`shved-yoga.dev.coventpro.ai`)
+      - traefik.http.routers.dev-shved-yoga.entrypoints=websecure
+      - traefik.http.routers.dev-shved-yoga.service=dev-shved-yoga
+      - traefik.http.routers.dev-shved-yoga.tls=true
+      - traefik.http.routers.dev-shved-yoga.tls.certresolver=letsencrypt
+
+      # --- service port ---
+      - traefik.http.services.dev-shved-yoga.loadbalancer.server.port=80
+
+networks:
+  coventit-net:
+    external: true
