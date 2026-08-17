@@ -58,7 +58,13 @@
   --color-greige: #d9d3cb;
   --color-taupe: #6e6259;
   --color-ink: #1a1816;
-  --color-copper: #b45b34;
+
+  /* Медный снят з її волосся. Початковий #b45b34 давав на папері лише
+     4.19:1 — нижче за AA. Затемнений до 4.86:1 зі збереженням тону.
+     На чорнильному тлі той самий акцент світлішає до 5.35:1: це одна
+     фарба у двох тональних адаптаціях, а не другий колір. */
+  --color-copper: #a9502e;
+  --color-copper-light: #c87a4b;
 
   --color-paper-warm: #efeae4;
   --color-hairline: color-mix(in oklab, #6e6259 22%, transparent);
@@ -129,6 +135,13 @@
 
   a {
     color: inherit;
+  }
+
+  /* Час і цифри — табличні, щоб 12:00 і 14:30 не «дихали» по ширині */
+  time,
+  .numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
   }
 
   :focus-visible {

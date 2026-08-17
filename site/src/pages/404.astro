@@ -1,0 +1,49 @@
+---
+import Base from "../layouts/Base.astro";
+import Nav from "../components/Nav.astro";
+import Footer from "../components/Footer.astro";
+import { meta, napriamy } from "../content/site";
+---
+
+<Base
+  title={`Сторінку не знайдено — ${meta.brand}`}
+  description="Такої сторінки немає. Повернімося до занять."
+  noindex
+>
+  <Nav />
+  <main id="main" class="bg-paper">
+    <div
+      class="mx-auto flex min-h-[62svh] max-w-[78rem] flex-col justify-center px-5 py-20 sm:px-8"
+    >
+      <p class="font-sans text-eyebrow uppercase text-copper">404</p>
+      <h1 class="mt-4 max-w-[26ch] text-h2 font-display font-medium text-ink">
+        Такої сторінки немає
+      </h1>
+      <p class="mt-5 max-w-[44ch] font-sans text-body text-ink/85">
+        Можливо, посилання застаріло або в адресі загубилася літера. Заняття
+        нікуди не поділися — вони на місці.
+      </p>
+
+      <div class="mt-9 flex flex-wrap items-center gap-x-6 gap-y-4">
+        <a
+          href="/"
+          class="inline-flex items-center gap-2.5 border border-taupe/40 px-7 py-3.5 font-sans text-[1.0625rem] font-medium text-ink transition-[color,border-color,translate] duration-200 hover:border-copper hover:text-copper active:translate-y-px"
+        >
+          На головну
+          <span aria-hidden="true">&#8594;</span>
+        </a>
+        {
+          napriamy.map((n) => (
+            <a
+              href={`/#${n.id}`}
+              class="font-sans text-small text-taupe underline decoration-taupe/40 decoration-1 underline-offset-4 transition-colors hover:text-ink hover:decoration-copper"
+            >
+              {n.title}
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Base>

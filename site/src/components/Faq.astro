@@ -7,8 +7,7 @@ import { faq, pered } from "../content/site";
     class="mx-auto grid max-w-[78rem] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-20"
   >
     <div class="reveal">
-      <p class="font-sans text-eyebrow uppercase text-copper">{pered.eyebrow}</p>
-      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+      <h2 class="text-h2 font-display font-medium text-ink">
         {pered.title}
       </h2>
       <ul class="mt-7 flex flex-col gap-4">
@@ -29,8 +28,9 @@ import { faq, pered } from "../content/site";
     </div>
 
     <div class="reveal">
-      <p class="font-sans text-eyebrow uppercase text-copper">Часті запитання</p>
-      <ul class="mt-6 border-t border-taupe/25">
+      <!-- Це справжній заголовок колонки, а не декоративна підпис -->
+      <h2 class="text-h2 font-display font-medium text-ink">Часті запитання</h2>
+      <ul class="mt-7 border-t border-taupe/25">
         {
           faq.map((item) => (
             <li class="border-b border-taupe/25">

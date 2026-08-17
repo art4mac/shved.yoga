@@ -29,7 +29,9 @@ const {
     target="_blank"
     rel="noopener"
     class:list={[
-      "group inline-flex items-center gap-2.5 px-7 py-3.5 font-sans text-[1.0625rem] font-medium transition-colors duration-200",
+      "group inline-flex items-center gap-2.5 px-7 py-3.5 font-sans text-[1.0625rem] font-medium transition-[color,background-color,border-color,translate] duration-200",
+      // Натиснутий стан: без нього кнопка не відповідає на дотик
+      "active:translate-y-px",
       variant === "solid"
         ? "bg-copper text-paper hover:bg-ink"
         : "border border-taupe/40 text-ink hover:border-copper hover:text-copper",

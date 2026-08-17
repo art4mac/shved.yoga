@@ -162,6 +162,48 @@ const jsonLd = {
         items.forEach((el) => io.observe(el));
       })();
 
+      // Активный пункт меню. Признак не только цветом — ещё подчёркиванием:
+      // цвет как единственный сигнал не проходит по доступности.
+      (() => {
+        const links = document.querySelectorAll("[data-nav-link]");
+        if (!links.length || !("IntersectionObserver" in window)) return;
+
+        const byId = new Map();
+        links.forEach((link) => {
+          const id = link.dataset.navLink.replace("#", "");
+          const section = document.getElementById(id);
+          if (section) byId.set(section, link);
+        });
+        if (!byId.size) return;
+
+        // Держим множество видимых секций, а не последнюю сработавшую: иначе
+        // при возврате на первый экран в меню висит устаревший пункт.
+        const visible = new Set();
+        const order = [...byId.keys()];
+        let current = null;
+
+        const apply = () => {
+          const top = order.find((section) => visible.has(section));
+          const link = top ? byId.get(top) : null;
+          if (link === current) return;
+          current?.removeAttribute("aria-current");
+          link?.setAttribute("aria-current", "true");
+          current = link ?? null;
+        };
+
+        const spy = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) visible.add(entry.target);
+              else visible.delete(entry.target);
+            });
+            apply();
+          },
+          { rootMargin: "-45% 0px -50% 0px" },
+        );
+        order.forEach((section) => spy.observe(section));
+      })();
+
       // Атрибуция: считаем, какая кнопка увела в бота.
       document.addEventListener("click", (e) => {
         const link = e.target.closest("a[data-cta]");
