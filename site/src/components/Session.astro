@@ -5,46 +5,55 @@ import { zaniattia } from "../content/site";
  * Дуга заняття. Порядок тут несе інформацію — це справжня послідовність
  * практики, тому лінія й підписи країв честні. Конкретних хвилин навмисно
  * немає: ми їх не знаємо, а вигадувати розклад чужого заняття не будемо.
+ *
+ * Права колонка — думка про килимок і два уточнення під нею. Вона несе
+ * власний зміст, а не пояснювальний абзац біля заголовка.
  */
 ---
 
 <section class="bg-paper-warm py-20 sm:py-28">
-  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
-    <header class="reveal max-w-[42ch]">
+  <div
+    class="mx-auto grid max-w-[78rem] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:gap-20"
+  >
+    <div class="reveal">
       <p class="font-sans text-eyebrow uppercase text-copper">
         {zaniattia.eyebrow}
       </p>
-      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+      <h2 class="mt-4 max-w-[30ch] text-h2 font-display font-medium text-ink">
         {zaniattia.title}
       </h2>
-    </header>
 
-    <div class="reveal relative mt-14 sm:mt-16">
-      <span class="font-sans text-eyebrow uppercase text-taupe">Початок</span>
+      <div class="mt-12">
+        <span class="font-sans text-eyebrow uppercase text-taupe">Початок</span>
 
-      <ol class="relative mt-5 border-l border-taupe/25 pl-7 sm:pl-9">
-        {
-          zaniattia.arc.map((step) => (
-            <li class="relative pb-6 last:pb-0">
-              <span
-                aria-hidden="true"
-                class="absolute -left-7 top-3 h-px w-4 bg-taupe/35 sm:-left-9 sm:w-6"
-              />
-              <p class="font-display text-[1.125rem] leading-snug text-ink sm:text-[1.25rem]">
-                {step}
-              </p>
-            </li>
-          ))
-        }
-      </ol>
+        <ol class="relative mt-5 border-l border-taupe/25 pl-7 sm:pl-9">
+          {
+            zaniattia.arc.map((step) => (
+              <li class="relative pb-6 last:pb-0">
+                <span
+                  aria-hidden="true"
+                  class="absolute -left-7 top-3 h-px w-4 bg-taupe/35 sm:-left-9 sm:w-6"
+                />
+                <p class="font-display text-[1.125rem] leading-snug text-ink sm:text-[1.25rem]">
+                  {step}
+                </p>
+              </li>
+            ))
+          }
+        </ol>
 
-      <span class="mt-5 block font-sans text-eyebrow uppercase text-taupe">
-        90 хвилин
-      </span>
+        <span class="mt-5 block font-sans text-eyebrow uppercase text-taupe">
+          90 хвилин
+        </span>
+      </div>
+    </div>
 
-      <ul
-        class="mt-12 flex flex-col gap-3 border-t border-taupe/20 pt-8 sm:flex-row sm:gap-10"
-      >
+    <aside class="reveal lg:pt-14">
+      <p class="font-display text-lead italic leading-[1.5] text-ink/85">
+        {zaniattia.outro}
+      </p>
+
+      <ul class="mt-9 flex flex-col gap-4 border-t border-taupe/20 pt-8">
         {
           zaniattia.extra.map((item) => (
             <li class="flex gap-3 font-sans text-body text-taupe">
@@ -54,10 +63,6 @@ import { zaniattia } from "../content/site";
           ))
         }
       </ul>
-
-      <p class="mt-12 max-w-[46ch] font-display text-lead italic text-ink/80">
-        {zaniattia.outro}
-      </p>
-    </div>
+    </aside>
   </div>
 </section>

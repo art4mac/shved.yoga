@@ -2,38 +2,54 @@
 import { Image } from "astro:assets";
 import { intro } from "../content/site";
 import Cta from "./Cta.astro";
-import portrait from "../assets/photos/intro.jpg";
+import cutout from "../assets/photos/intro-cutout.png";
+
+/**
+ * Знайомство. Вирізана фігура стоїть тлом унизу, зсунута праворуч на 20%
+ * ширини секції, і видна цілком — правий край кадру рівно на межі екрана.
+ *
+ * Нічого поверх кадру не лежить: ні маски, ні підкладки. Тому текст мусить
+ * розходитися з фігурою по вертикалі, а не накриватися нею — звідси великий
+ * нижній відступ секції, який тримає абзаци над кадром.
+ */
 ---
 
-<section class="bg-paper py-20 sm:py-28">
+<section
+  class="relative isolate overflow-hidden bg-paper py-20 sm:py-28"
+>
+  <!-- Кадр віддзеркалено засобами CSS, без другого файлу, і поставлено на
+       рівень початку тексту: верх кадру = верх заголовка. -->
   <div
-    class="mx-auto grid max-w-[78rem] items-start gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20"
+    aria-hidden="true"
+    class="pointer-events-none absolute top-20 right-[6%] hidden w-[46%] -scale-x-100 md:block sm:top-28"
   >
-    <div class="reveal">
-      <p class="font-sans text-eyebrow uppercase text-copper">
-        {intro.eyebrow}
-      </p>
-      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+    <Image
+      src={cutout}
+      alt=""
+      widths={[420, 640, 900]}
+      sizes="40vw"
+      format="webp"
+      loading="lazy"
+      class="h-auto w-full object-contain"
+    />
+  </div>
+
+  <div class="relative mx-auto max-w-[78rem] px-5 sm:px-8">
+    <div class="reveal max-w-[34rem]">
+      <h2 class="text-h2 font-display font-medium text-ink">
         {intro.title}
       </h2>
 
-      <div class="mt-7 flex max-w-[52ch] flex-col gap-4 font-sans text-body text-ink/85">
+      <div class="mt-7 flex flex-col gap-4 font-sans text-body text-ink/85">
         {intro.paragraphs.map((p) => <p>{p}</p>)}
       </div>
 
-      <Cta source="intro" label="Обрати своє заняття" variant="quiet" class="mt-9" />
-    </div>
-
-    <figure class="reveal">
-      <Image
-        src={portrait}
-        alt="Портрет Олі Швед"
-        widths={[420, 640, 900]}
-        sizes="(min-width: 1024px) 26rem, 100vw"
-        format="avif"
-        loading="lazy"
-        class="w-full object-cover"
+      <Cta
+        source="intro"
+        label="Обрати своє заняття"
+        variant="quiet"
+        class="mt-9"
       />
-    </figure>
+    </div>
   </div>
 </section>

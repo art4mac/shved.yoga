@@ -5,52 +5,58 @@ import Cta from "./Cta.astro";
 /**
  * Розклад і вартість разом. Рішення про купівлю ухвалюється один раз,
  * тому час, місця й ціна мусять бути в одному місці сторінки.
+ *
+ * Час стоїть праворуч від заголовка, ціни — рядом нижче на всю ширину.
  */
 ---
 
 <section id="rozklad" class="scroll-mt-20 bg-ink py-20 text-paper sm:py-28">
   <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
-    <header class="reveal max-w-[34ch]">
-      <p class="font-sans text-eyebrow uppercase text-copper">
-        {rozklad.eyebrow}
-      </p>
-      <h2 class="mt-4 text-h2 font-display font-medium text-paper">
-        {rozklad.title}
-      </h2>
-      <p class="mt-6 max-w-[48ch] font-sans text-body text-paper/70">
-        {rozklad.lead}
-      </p>
-    </header>
+    <div
+      class="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] lg:items-start lg:gap-20"
+    >
+      <header class="reveal">
+        <p class="font-sans text-eyebrow uppercase text-copper-light">
+          {rozklad.eyebrow}
+        </p>
+        <h2 class="mt-4 max-w-[18ch] text-h2 font-display font-medium text-paper">
+          {rozklad.title}
+        </h2>
+        <p class="mt-6 max-w-[46ch] font-sans text-body text-paper/70">
+          {rozklad.lead}
+        </p>
+      </header>
 
-    <!-- Час -->
-    <ul class="reveal mt-14 grid gap-px overflow-hidden bg-paper/15 sm:grid-cols-2">
-      {
-        napriamy.map((n) => (
-          <li class="bg-ink p-7 sm:p-9">
-            <time
-              datetime={n.timeFrom}
-              class="font-display text-h3 font-medium text-paper"
-            >
-              {n.timeFrom}&#8202;–&#8202;{n.timeTo}
-            </time>
-            <p class="mt-2.5 font-sans text-body text-paper/85">{n.title}</p>
-            <p class="mt-1 font-sans text-small text-paper/55">
-              90 хвилин &#183; {n.limit}
-            </p>
-          </li>
-        ))
-      }
-    </ul>
+      <!-- Час -->
+      <ul class="reveal flex flex-col divide-y divide-paper/15 border-y border-paper/15">
+        {
+          napriamy.map((n) => (
+            <li class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 py-6">
+              <div>
+                <p class="font-sans text-body text-paper">{n.title}</p>
+                <p class="mt-1 font-sans text-small text-paper/55">
+                  90 хвилин &#183; {n.limit}
+                </p>
+              </div>
+              <time
+                datetime={n.timeFrom}
+                class="font-display text-h3 font-medium text-paper"
+              >
+                {n.timeFrom}&#8202;–&#8202;{n.timeTo}
+              </time>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
 
     <!-- Ціна -->
-    <ul class="reveal mt-12 grid gap-px overflow-hidden bg-paper/15 lg:grid-cols-3">
+    <ul class="reveal mt-14 grid gap-px overflow-hidden bg-paper/15 lg:grid-cols-3">
       {
         rozklad.prices.map((p) => (
           <li class="flex flex-col bg-ink p-7 sm:p-9">
-            <p class="font-sans text-eyebrow uppercase text-paper/55">
-              {p.title}
-            </p>
-            <p class="mt-4 font-display text-h3 font-medium text-copper">
+            <p class="font-sans text-eyebrow uppercase text-paper/55">{p.title}</p>
+            <p class="mt-4 font-display text-h3 font-medium text-copper-light">
               {p.price}
             </p>
             <p class="mt-4 font-sans text-small text-paper/70">{p.note}</p>
@@ -59,13 +65,18 @@ import Cta from "./Cta.astro";
       }
     </ul>
 
-    <p class="reveal mt-10 max-w-[58ch] font-sans text-small text-paper/70">
-      {rozklad.gift}
-    </p>
+    <!-- Кнопка праворуч від тексту про сертифікат.
+         Підпис під кнопкою на темному тлі: taupe тут не читається. -->
+    <div
+      class="reveal mt-12 flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16"
+    >
+      <p class="max-w-[58ch] font-sans text-small text-paper/70">
+        {rozklad.gift}
+      </p>
 
-    <!-- Підпис під кнопкою на темному тлі: taupe тут не читається. -->
-    <div class="reveal mt-11 [&_span.text-taupe]:text-paper/60">
-      <Cta source="price" withNote />
+      <div class="shrink-0 [&_span.text-taupe]:text-paper/60">
+        <Cta source="price" withNote />
+      </div>
     </div>
   </div>
 </section>

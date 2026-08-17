@@ -2,28 +2,32 @@
 import { Image } from "astro:assets";
 import { about } from "../content/site";
 import Cta from "./Cta.astro";
-import photo from "../assets/photos/about.jpg";
+import photo from "../assets/photos/about-cutout.png";
 ---
 
-<section id="pro-mene" class="scroll-mt-20 bg-paper py-20 sm:py-28">
+<section
+  id="pro-mene"
+  class="scroll-mt-20 overflow-hidden bg-paper py-20 sm:py-28"
+>
   <div
     class="mx-auto grid max-w-[78rem] items-start gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:gap-20"
   >
-    <figure class="reveal lg:order-1">
+    <!-- Кадр на 30% більший за свою колонку і опущений: ліва частина навмисно
+         виходить за межу сайту й зрізається. -->
+    <figure class="reveal lg:order-1 lg:-mt-8 lg:-ml-[6rem] lg:w-[33rem] lg:max-w-none">
       <Image
         src={photo}
-        alt="Оля Швед на килимку"
-        widths={[380, 600, 840]}
-        sizes="(min-width: 1024px) 24rem, 100vw"
-        format="avif"
+        alt="Оля Швед сидить зі складеними руками"
+        widths={[500, 750, 1000]}
+        sizes="(min-width: 1024px) 31rem, 100vw"
+        format="webp"
         loading="lazy"
-        class="w-full object-cover"
+        class="h-auto w-full object-contain"
       />
     </figure>
 
     <div class="reveal lg:order-2">
-      <p class="font-sans text-eyebrow uppercase text-copper">{about.eyebrow}</p>
-      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+      <h2 class="text-h2 font-display font-medium text-ink">
         {about.title}
       </h2>
 

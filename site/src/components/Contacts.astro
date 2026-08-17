@@ -14,10 +14,29 @@ const mapHref = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
   <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
     <div class="grid gap-14 lg:grid-cols-2 lg:gap-20">
       <div class="reveal">
-        <p class="font-sans text-eyebrow uppercase text-copper">
-          {kontakty.eyebrow}
-        </p>
-        <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+        <!-- Відео стоїть перед заголовком, у тій самій колонці. Файл на нашому
+             хості: ні сторонніх скриптів, ні cookies. Джерело — пост
+             zal20_lviv, з вертикального кадру 720×1280 вирізано центральний
+             квадрат. Права на медіа студії варто підтвердити з ZAL.20.
+             Автозапуск робить скрипт, а не атрибут: під `prefers-reduced-motion`
+             відео лишається на постері. -->
+        <video
+          data-ambient
+          class="mb-10 w-full max-w-[30rem]"
+          poster="/video/zal20-square-poster.jpg"
+          width="720"
+          height="720"
+          controls
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        >
+          <source src="/video/zal20-square.webm" type="video/webm" />
+          <source src="/video/zal20-square.mp4" type="video/mp4" />
+        </video>
+
+        <h2 class="text-h2 font-display font-medium text-ink">
           {kontakty.title}
         </h2>
 
@@ -124,3 +143,20 @@ const mapHref = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
     </div>
   </div>
 </section>
+
+<script>
+  const video = document.querySelector<HTMLVideoElement>("video[data-ambient]");
+  if (video && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    // Запускаємо лише коли відео справді видно, щоб не гріти процесор дарма.
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) video.play().catch(() => {});
+          else video.pause();
+        });
+      },
+      { threshold: 0.35 },
+    );
+    io.observe(video);
+  }
+</script>

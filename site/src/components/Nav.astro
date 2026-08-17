@@ -10,7 +10,7 @@ import { nav, meta, bot, cta } from "../content/site";
   >
     <a
       href="/"
-      class="font-display text-[1.0625rem] font-medium tracking-tight text-ink"
+      class="font-display text-[1.0625rem] font-medium tracking-tight text-ink transition-opacity active:opacity-70"
     >
       {meta.brand}
     </a>
@@ -22,7 +22,8 @@ import { nav, meta, bot, cta } from "../content/site";
             <li>
               <a
                 href={item.href}
-                class="font-sans text-small text-taupe transition-colors hover:text-ink"
+                data-nav-link={item.href}
+                class="font-sans text-small text-taupe underline decoration-transparent decoration-1 underline-offset-[6px] transition-colors hover:text-ink aria-[current=true]:text-ink aria-[current=true]:decoration-copper"
               >
                 {item.label}
               </a>
@@ -39,7 +40,7 @@ import { nav, meta, bot, cta } from "../content/site";
       data-cta="nav"
       target="_blank"
       rel="noopener"
-      class="hidden shrink-0 bg-copper px-5 py-2.5 font-sans text-small font-medium text-paper transition-colors hover:bg-ink sm:inline-block"
+      class="hidden shrink-0 bg-copper px-5 py-2.5 font-sans text-small font-medium text-paper transition-[color,background-color,translate] hover:bg-ink active:translate-y-px sm:inline-block"
     >
       {cta.label}
     </a>

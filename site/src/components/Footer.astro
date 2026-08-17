@@ -2,26 +2,44 @@
 import { meta, kontakty } from "../content/site";
 
 const year = new Date().getFullYear();
+
+/**
+ * utm_source беремо з хоста збірки, а не хардкодимо: коли клієнт обере домен,
+ * мітка поїде за ним сама.
+ */
+const source = Astro.site ? new URL(Astro.site).hostname : "shved.yoga";
+const coventHref = `https://coventpro.ai/?utm_source=${source}&utm_medium=referral&utm_campaign=made-by-covent`;
 ---
 
-<footer class="border-t border-taupe/20 bg-paper py-10">
+<footer class="border-t border-taupe/20 bg-paper">
   <div
-    class="mx-auto flex max-w-[78rem] flex-col gap-5 px-5 sm:px-8 md:flex-row md:items-center md:justify-between"
+    class="mx-auto flex max-w-[78rem] flex-col gap-5 px-5 py-10 sm:px-8 md:flex-row md:items-center md:justify-between"
   >
-    <p class="font-display text-[1.0625rem] font-medium text-ink">
-      {meta.brand}
-    </p>
+    <div>
+      <p class="font-display text-[1.0625rem] font-medium text-ink">
+        {meta.brand}
+      </p>
+      <p class="mt-1.5 font-sans text-small text-taupe/80">
+        &#169; {year} {kontakty.city}
+      </p>
+    </div>
 
     <nav aria-label="Додаткові посилання">
       <ul class="flex flex-wrap items-center gap-x-6 gap-y-2 font-sans text-small text-taupe">
         <li>
-          <a href={kontakty.instagram} target="_blank" rel="noopener" class="hover:text-ink"
-            >Instagram</a
+          <a
+            href={kontakty.instagram}
+            target="_blank"
+            rel="noopener"
+            class="hover:text-ink">Instagram</a
           >
         </li>
         <li>
-          <a href={kontakty.telegram} target="_blank" rel="noopener" class="hover:text-ink"
-            >Telegram</a
+          <a
+            href={kontakty.telegram}
+            target="_blank"
+            rel="noopener"
+            class="hover:text-ink">Telegram</a
           >
         </li>
         <li>
@@ -30,8 +48,23 @@ const year = new Date().getFullYear();
       </ul>
     </nav>
 
-    <p class="font-sans text-small text-taupe/80">
-      &#169; {year} {kontakty.city}
-    </p>
+    <!-- На місці копірайту тепер підпис автора -->
+    <a
+      href={coventHref}
+      target="_blank"
+      rel="noopener"
+      class="group inline-flex items-center gap-1.5 font-sans text-small text-taupe transition-colors hover:text-ink"
+    >
+      <span>Зроблено в</span>
+      <img
+        src="/covent-wordmark.svg"
+        alt="Covent AI"
+        width="129"
+        height="35"
+        loading="lazy"
+        decoding="async"
+        class="h-[35px] w-auto opacity-85 transition-opacity group-hover:opacity-100"
+      />
+    </a>
   </div>
 </footer>

@@ -2,138 +2,233 @@
 import { Image } from "astro:assets";
 import { napriamy } from "../content/site";
 import Cta from "./Cta.astro";
-import hatha from "../assets/photos/hatha.jpg";
-import prasu from "../assets/photos/prasu.jpg";
+import hatha from "../assets/photos/napriam-hatha.png";
+import prasu from "../assets/photos/napriam-prasu.png";
 
 /**
- * Подписной элемент страницы: временная рейка. Вся пропозиція Олі — це одна
- * субота у двох вікнах, тому розклад тут не таблиця в кінці сторінки,
- * а несуча вертикаль, на якій напрями стоять кожен на своїй годині.
+ * Напрями переключенням, а не двома довгими блоками один під одним: сторінка
+ * коротшає вдвічі, а вибір напряму лишається головною дією секції.
+ *
+ * Якірні посилання /#hatha і /#prasu мусять і далі працювати — скрипт читає
+ * hash і відкриває потрібну панель.
  */
 const images: Record<string, ImageMetadata> = { hatha, prasu };
 const alts: Record<string, string> = {
-  hatha: "Оля Швед у позі собаки мордою вниз",
-  prasu: "Кисті рук на стопі — деталь практики",
+  hatha: "Оля Швед сидить зі складеними руками",
+  prasu: "Оля Швед у боковому нахилі із захватом стопи",
 };
 ---
 
-<section id="napriamy" class="scroll-mt-20 bg-paper py-20 sm:py-28">
+<section
+  id="napriamy"
+  class="scroll-mt-20 isolate overflow-hidden bg-paper py-20 sm:py-28"
+  data-switcher
+  aria-roledescription="перемикач напрямів"
+>
   <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
-    <header class="reveal max-w-[30ch]">
+    <header class="reveal max-w-[44ch]">
       <p class="font-sans text-eyebrow uppercase text-copper">Щосуботи</p>
       <h2 class="mt-4 text-h2 font-display font-medium text-ink">
         Два напрями, дві години
       </h2>
+      <p class="mt-5 font-sans text-body text-taupe">
+        Практика йоги, свідома робота з тілом — як окремий вид задоволення.
+      </p>
     </header>
 
-    <div class="relative mt-14 sm:mt-20">
-      <!-- Рейка. Тонка лінія, до якої прив'язані години. -->
-      <div
-        aria-hidden="true"
-        class="hairline absolute left-32 top-3 bottom-3 hidden w-px lg:block"
-      >
-      </div>
+    <div
+      role="tablist"
+      aria-label="Оберіть напрям"
+      class="reveal mt-10 inline-flex divide-x divide-taupe/25 border border-taupe/25"
+    >
+      {
+        napriamy.map((n, i) => (
+          <button
+            type="button"
+            id={`tab-${n.id}`}
+            role="tab"
+            aria-controls={`panel-${n.id}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            tabindex={i === 0 ? 0 : -1}
+            data-switch-tab={n.id}
+            class="flex items-baseline gap-2.5 px-5 py-3.5 font-sans text-small text-taupe transition-colors hover:text-ink aria-selected:bg-ink aria-selected:text-paper sm:px-7"
+          >
+            <time class="font-display font-medium">{n.time}</time>
+            <span>{n.title.split(" ")[0]}</span>
+          </button>
+        ))
+      }
+    </div>
 
-      <div class="flex flex-col gap-20 sm:gap-28">
-        {
-          napriamy.map((n) => (
-            <article
-              id={n.id}
-              class="reveal relative scroll-mt-24 lg:pl-[10.5rem]"
-            >
-              {/* Година на рейці */}
-              <div
-                class="mb-5 flex items-baseline gap-3 lg:absolute lg:left-0 lg:top-0 lg:mb-0 lg:w-32 lg:justify-end"
-              >
-                <time
-                  datetime={n.timeFrom}
-                  class="font-display text-clock font-medium text-ink"
-                >
-                  {n.time}
-                </time>
-                <span class="font-sans text-eyebrow uppercase text-taupe lg:hidden">
-                  {n.timeFrom}–{n.timeTo}
-                </span>
-              </div>
-              <span
-                aria-hidden="true"
-                class="absolute left-32 top-2.5 hidden h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-copper lg:block"
-              />
+    <!-- Панелі НЕ складені в одну клітинку сітки: інакше висоту задавала б
+         довша панель, і під коротшою залишалася б порожня діра. Перемикач має
+         право переверстати сторінку під активний напрям. -->
+    <div class="mt-12 sm:mt-14">
+      {
+        napriamy.map((n, i) => (
+          <article
+            id={`panel-${n.id}`}
+            role="tabpanel"
+            aria-labelledby={`tab-${n.id}`}
+            data-panel={n.id}
+            hidden={i !== 0}
+          >
+            <span id={n.id} class="sr-only" />
 
-              <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-14">
-                <div>
-                  <h3 class="text-h3 font-display font-medium text-ink">
-                    {n.title}
-                  </h3>
-                  <p class="mt-2 font-sans text-small text-taupe">
-                    <span class="hidden lg:inline">
-                      {n.timeFrom}–{n.timeTo} &#183;{" "}
-                    </span>
-                    90 хвилин &#183; {n.limit}
-                  </p>
+            <!-- Кадр стоїть тлом праворуч, зсунутий на 50% своєї ширини:
+                 права половина навмисно виходить за межу сайту й зрізається. -->
+            <div class="relative">
+              <div class="lg:max-w-[40rem]">
+                <h3 class="text-h3 font-display font-medium text-ink">
+                  {n.title}
+                </h3>
+                <p class="mt-2 font-sans text-small text-taupe">
+                  {n.timeFrom}&#8202;–&#8202;{n.timeTo} &#183; 90 хвилин &#183;{" "}
+                  {n.limit}
+                </p>
 
-                  <div class="mt-6 flex flex-col gap-4 font-sans text-body text-ink/85">
-                    {n.paragraphs.map((p) => (
-                      <p>{p}</p>
-                    ))}
-                  </div>
-
-                  <p class="mt-8 font-sans text-small font-medium text-ink">
-                    {n.fitTitle}
-                  </p>
-                  <ul class="mt-3 flex flex-col gap-2">
-                    {n.fit.map((item) => (
-                      <li class="flex gap-3 font-sans text-body text-ink/85">
-                        <span aria-hidden="true" class="mt-2.5 h-px w-4 shrink-0 bg-copper" />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {n.aside && (
-                    <p class="mt-8 border-l-2 border-copper/40 pl-5 font-display text-[1.0625rem] italic text-taupe">
-                      {n.aside}
-                    </p>
-                  )}
-
-                  {n.note && (
-                    <p class="mt-8 bg-paper-warm p-5 font-sans text-small text-taupe">
-                      {n.note.text}{" "}
-                      <a
-                        href={n.note.href}
-                        target="_blank"
-                        rel="noopener"
-                        class="text-ink underline decoration-copper decoration-1 underline-offset-4 hover:text-copper"
-                      >
-                        {n.note.linkLabel}
-                      </a>
-                    </p>
-                  )}
-
-                  <Cta
-                    source={n.source}
-                    napriam={n.id}
-                    label={n.ctaLabel}
-                    class="mt-9"
-                  />
+                <div class="mt-6 flex flex-col gap-4 font-sans text-body text-ink/85">
+                  {n.paragraphs.map((p) => (
+                    <p>{p}</p>
+                  ))}
                 </div>
 
-                <figure class="lg:pt-1">
-                  <Image
-                    src={images[n.id]!}
-                    alt={alts[n.id]!}
-                    widths={[400, 640, 960]}
-                    sizes="(min-width: 1024px) 20rem, 100vw"
-                    format="avif"
-                    loading="lazy"
-                    class="w-full object-cover"
-                  />
-                </figure>
+                <p class="mt-8 font-sans text-small font-medium text-ink">
+                  {n.fitTitle}
+                </p>
+                <ul class="mt-3 flex flex-col gap-2">
+                  {n.fit.map((item) => (
+                    <li class="flex gap-3 font-sans text-body text-ink/85">
+                      <span
+                        aria-hidden="true"
+                        class="mt-2.5 h-px w-4 shrink-0 bg-copper"
+                      />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {n.aside && (
+                  <p class="mt-8 border-l-2 border-copper/40 pl-5 font-display text-[1.0625rem] italic leading-[1.5] text-taupe">
+                    {n.aside}
+                  </p>
+                )}
+
+                {n.note && (
+                  <p class="mt-8 bg-paper-warm p-5 font-sans text-small text-taupe">
+                    {n.note.text}{" "}
+                    <a
+                      href={n.note.href}
+                      target="_blank"
+                      rel="noopener"
+                      class="text-ink underline decoration-copper decoration-1 underline-offset-4 hover:text-copper"
+                    >
+                      {n.note.linkLabel}
+                    </a>
+                  </p>
+                )}
+
+                <Cta
+                  source={n.source}
+                  napriam={n.id}
+                  label={n.ctaLabel}
+                  class="mt-9"
+                />
               </div>
-            </article>
-          ))
-        }
-      </div>
+
+              <!-- Кадр лежить під текстом (-z-10), тому може заходити на нього.
+                   Зсуви на кожен напрям свої: у хатхи низ килимка вирівняний по
+                   низу кнопки, у прасу низ кадру — по рядку «побути в затишному
+                   колі жінок…», який замір показав на 716px від верху панелі. -->
+              <figure
+                class:list={[
+                  /* lg:mt-0 тут бути НЕ повинно: Tailwind ставить правило
+                     .lg\:-mt-[274px] раніше за .lg\:mt-0, специфічність
+                     однакова, і нульовий відступ перемагав, гасячи зсув. */
+                  "mt-10 lg:absolute lg:top-0 lg:right-0 lg:w-[52rem] lg:max-w-none lg:-z-10",
+                  n.id === "hatha"
+                    ? "lg:translate-x-[20%] lg:-mt-[154px]"
+                    : "lg:translate-x-[30%] lg:mt-[189px]",
+                ]}
+              >
+                <Image
+                  src={images[n.id]!}
+                  alt={alts[n.id]!}
+                  widths={[700, 1000, 1400]}
+                  sizes="(min-width: 1024px) 52rem, 100vw"
+                  format="webp"
+                  loading="lazy"
+                  class="h-auto w-full object-contain"
+                />
+              </figure>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </div>
 </section>
+
+<style>
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+
+  [data-panel]:not([hidden]) {
+    animation: panel-in 340ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-panel]:not([hidden]) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>("[data-switcher]");
+  const tabs = [...(root?.querySelectorAll<HTMLButtonElement>("[data-switch-tab]") ?? [])];
+  const panels = [...(root?.querySelectorAll<HTMLElement>("[data-panel]") ?? [])];
+
+  if (root && tabs.length > 1 && tabs.length === panels.length) {
+    let index = 0;
+
+    const show = (next: number) => {
+      index = (next + panels.length) % panels.length;
+      panels.forEach((panel, i) => {
+        panel.hidden = i !== index;
+      });
+      tabs.forEach((tab, i) => {
+        const active = i === index;
+        tab.setAttribute("aria-selected", active ? "true" : "false");
+        tab.tabIndex = active ? 0 : -1;
+      });
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener("click", () => show(i));
+      tab.addEventListener("keydown", (event) => {
+        const delta =
+          event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+        if (!delta) return;
+        event.preventDefault();
+        show(index + delta);
+        tabs[index]?.focus();
+      });
+    });
+
+    // Якірні посилання виду /#prasu відкривають свою панель
+    const fromHash = () => {
+      const id = location.hash.replace("#", "");
+      const found = tabs.findIndex((tab) => tab.dataset.switchTab === id);
+      if (found >= 0) show(found);
+    };
+
+    window.addEventListener("hashchange", fromHash);
+    show(0);
+    fromHash();
+  }
+</script>
