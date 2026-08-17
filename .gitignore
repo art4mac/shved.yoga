@@ -1,0 +1,13 @@
+.DS_Store
+.remember/
+
+# Змінні середовища: у git тільки .env.example
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+site/dist/
+site/.astro/
+npm-debug.log*
