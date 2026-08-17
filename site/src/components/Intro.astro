@@ -1,0 +1,39 @@
+---
+import { Image } from "astro:assets";
+import { intro } from "../content/site";
+import Cta from "./Cta.astro";
+import portrait from "../assets/photos/intro.jpg";
+---
+
+<section class="bg-paper py-20 sm:py-28">
+  <div
+    class="mx-auto grid max-w-[78rem] items-start gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:gap-20"
+  >
+    <div class="reveal">
+      <p class="font-sans text-eyebrow uppercase text-copper">
+        {intro.eyebrow}
+      </p>
+      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+        {intro.title}
+      </h2>
+
+      <div class="mt-7 flex max-w-[52ch] flex-col gap-4 font-sans text-body text-ink/85">
+        {intro.paragraphs.map((p) => <p>{p}</p>)}
+      </div>
+
+      <Cta source="intro" label="Обрати своє заняття" variant="quiet" class="mt-9" />
+    </div>
+
+    <figure class="reveal">
+      <Image
+        src={portrait}
+        alt="Портрет Олі Швед"
+        widths={[420, 640, 900]}
+        sizes="(min-width: 1024px) 26rem, 100vw"
+        format="avif"
+        loading="lazy"
+        class="w-full object-cover"
+      />
+    </figure>
+  </div>
+</section>

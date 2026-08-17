@@ -1,0 +1,50 @@
+---
+import { bot, cta } from "../content/site";
+
+interface Props {
+  /** Источник для deep link и для атрибуции в GA4. */
+  source: string;
+  label?: string;
+  napriam?: string;
+  withNote?: boolean;
+  variant?: "solid" | "quiet";
+  class?: string;
+}
+
+const {
+  source,
+  label = cta.label,
+  napriam,
+  withNote = false,
+  variant = "solid",
+  class: className = "",
+} = Astro.props;
+---
+
+<div class:list={["flex flex-col items-start gap-2.5", className]}>
+  <a
+    href={bot(source)}
+    data-cta={source}
+    data-napriam={napriam}
+    target="_blank"
+    rel="noopener"
+    class:list={[
+      "group inline-flex items-center gap-2.5 px-7 py-3.5 font-sans text-[1.0625rem] font-medium transition-colors duration-200",
+      variant === "solid"
+        ? "bg-copper text-paper hover:bg-ink"
+        : "border border-taupe/40 text-ink hover:border-copper hover:text-copper",
+    ]}
+  >
+    {label}
+    <span
+      aria-hidden="true"
+      class="translate-x-0 transition-transform duration-200 group-hover:translate-x-1"
+      >&#8594;</span
+    >
+  </a>
+  {
+    withNote && (
+      <span class="font-sans text-small text-taupe">{cta.note}</span>
+    )
+  }
+</div>

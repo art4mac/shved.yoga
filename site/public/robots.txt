@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Адмінка живе на тому самому домені (ADR-0005) і не має потрапляти в індекс.
+Disallow: /admin
+Disallow: /admin/

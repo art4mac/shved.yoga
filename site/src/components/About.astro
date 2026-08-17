@@ -1,0 +1,52 @@
+---
+import { Image } from "astro:assets";
+import { about } from "../content/site";
+import Cta from "./Cta.astro";
+import photo from "../assets/photos/about.jpg";
+---
+
+<section id="pro-mene" class="scroll-mt-20 bg-paper py-20 sm:py-28">
+  <div
+    class="mx-auto grid max-w-[78rem] items-start gap-12 px-5 sm:px-8 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] lg:gap-20"
+  >
+    <figure class="reveal lg:order-1">
+      <Image
+        src={photo}
+        alt="Оля Швед на килимку"
+        widths={[380, 600, 840]}
+        sizes="(min-width: 1024px) 24rem, 100vw"
+        format="avif"
+        loading="lazy"
+        class="w-full object-cover"
+      />
+    </figure>
+
+    <div class="reveal lg:order-2">
+      <p class="font-sans text-eyebrow uppercase text-copper">{about.eyebrow}</p>
+      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+        {about.title}
+      </h2>
+
+      <div class="mt-7 flex max-w-[56ch] flex-col gap-4 font-sans text-body text-ink/85">
+        {about.paragraphs.map((p) => <p>{p}</p>)}
+      </div>
+
+      <dl
+        class="mt-10 grid gap-x-8 gap-y-6 border-t border-taupe/20 pt-8 sm:grid-cols-2"
+      >
+        {
+          about.credentials.map((c) => (
+            <div>
+              <dt class="font-display text-[1.125rem] font-medium text-ink">
+                {c.value}
+              </dt>
+              <dd class="mt-1 font-sans text-small text-taupe">{c.label}</dd>
+            </div>
+          ))
+        }
+      </dl>
+
+      <Cta source="about" label="Приєднатися до заняття" variant="quiet" class="mt-10" />
+    </div>
+  </div>
+</section>

@@ -1,0 +1,10 @@
+Fixel typeface
+Copyright (c) MacPaw Inc.
+Licensed under the SIL Open Font License, Version 1.1.
+
+Source and full license text: https://fixel.macpaw.com/
+Font files obtained from: https://fonts.macpaw.com/fonts/FixelAll.zip
+
+Files in this directory (fixel-text-*.woff2) are subsets of FixelText,
+limited to Latin and Ukrainian Cyrillic, produced with fonttools/pyftsubset.
+Subsetting is a permitted modification under OFL 1.1.

@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Шрифты. Локальные, подмножество Latin + украинская кириллица.
+   Лицензии — OFL 1.1, тексты рядом в public/fonts/.
+   --------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/literata-display.woff2") format("woff2-variations");
+  font-weight: 450 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Справжній курсив, а не синтетичний нахил: браузер інакше просто скошує
+   прямий шрифт, і на антикві це видно одразу. */
+@font-face {
+  font-family: "Literata";
+  src: url("/fonts/literata-italic.woff2") format("woff2-variations");
+  font-weight: 450 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fixel";
+  src: url("/fonts/fixel-text-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fixel";
+  src: url("/fonts/fixel-text-medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fixel";
+  src: url("/fonts/fixel-text-semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------------------------------------------------------------------------
+   Токены. Палитра снята пипеткой со студийной съёмки Олі:
+   фон и greige — её фоны, taupe — коврик, copper — цвет волос.
+   Медный живёт только на действии. Больше нигде.
+   --------------------------------------------------------------------------- */
+
+@theme {
+  --color-paper: #f5f2ee;
+  --color-greige: #d9d3cb;
+  --color-taupe: #6e6259;
+  --color-ink: #1a1816;
+  --color-copper: #b45b34;
+
+  --color-paper-warm: #efeae4;
+  --color-hairline: color-mix(in oklab, #6e6259 22%, transparent);
+
+  --font-display: "Literata", Georgia, "Times New Roman", serif;
+  --font-sans: "Fixel", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-display: clamp(2.25rem, 4.4vw, 4rem);
+  --text-display--line-height: 1.06;
+  --text-display--letter-spacing: -0.02em;
+
+  --text-h2: clamp(1.75rem, 3.4vw, 2.75rem);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.015em;
+
+  --text-h3: clamp(1.3rem, 1.9vw, 1.6rem);
+  --text-h3--line-height: 1.2;
+
+  --text-lead: clamp(1.125rem, 1.5vw, 1.375rem);
+  --text-lead--line-height: 1.45;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.62;
+
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.5;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.18em;
+
+  --text-clock: clamp(1.125rem, 1.6vw, 1.375rem);
+  --text-clock--line-height: 1;
+  --text-clock--letter-spacing: 0.02em;
+}
+
+/* ---------------------------------------------------------------------------
+   База
+   --------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.62;
+    font-feature-settings: "ss01", "kern";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-copper);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-copper) 22%, transparent);
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Утилиты
+   --------------------------------------------------------------------------- */
+
+/** Тонкая линия того же семейства, что и временная рейка. */
+@utility hairline {
+  background-color: var(--color-hairline);
+}
+
+/** Появление секции по скроллу. Без transform — не ломает sticky внутри. */
+@utility reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  &.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

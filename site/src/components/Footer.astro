@@ -1,0 +1,37 @@
+---
+import { meta, kontakty } from "../content/site";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-taupe/20 bg-paper py-10">
+  <div
+    class="mx-auto flex max-w-[78rem] flex-col gap-5 px-5 sm:px-8 md:flex-row md:items-center md:justify-between"
+  >
+    <p class="font-display text-[1.0625rem] font-medium text-ink">
+      {meta.brand}
+    </p>
+
+    <nav aria-label="Додаткові посилання">
+      <ul class="flex flex-wrap items-center gap-x-6 gap-y-2 font-sans text-small text-taupe">
+        <li>
+          <a href={kontakty.instagram} target="_blank" rel="noopener" class="hover:text-ink"
+            >Instagram</a
+          >
+        </li>
+        <li>
+          <a href={kontakty.telegram} target="_blank" rel="noopener" class="hover:text-ink"
+            >Telegram</a
+          >
+        </li>
+        <li>
+          <a href="/privacy" class="hover:text-ink">Політика конфіденційності</a>
+        </li>
+      </ul>
+    </nav>
+
+    <p class="font-sans text-small text-taupe/80">
+      &#169; {year} {kontakty.city}
+    </p>
+  </div>
+</footer>

@@ -1,0 +1,139 @@
+---
+import { Image } from "astro:assets";
+import { napriamy } from "../content/site";
+import Cta from "./Cta.astro";
+import hatha from "../assets/photos/hatha.jpg";
+import prasu from "../assets/photos/prasu.jpg";
+
+/**
+ * Подписной элемент страницы: временная рейка. Вся пропозиція Олі — це одна
+ * субота у двох вікнах, тому розклад тут не таблиця в кінці сторінки,
+ * а несуча вертикаль, на якій напрями стоять кожен на своїй годині.
+ */
+const images: Record<string, ImageMetadata> = { hatha, prasu };
+const alts: Record<string, string> = {
+  hatha: "Оля Швед у позі собаки мордою вниз",
+  prasu: "Кисті рук на стопі — деталь практики",
+};
+---
+
+<section id="napriamy" class="scroll-mt-20 bg-paper py-20 sm:py-28">
+  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+    <header class="reveal max-w-[30ch]">
+      <p class="font-sans text-eyebrow uppercase text-copper">Щосуботи</p>
+      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+        Два напрями, дві години
+      </h2>
+    </header>
+
+    <div class="relative mt-14 sm:mt-20">
+      <!-- Рейка. Тонка лінія, до якої прив'язані години. -->
+      <div
+        aria-hidden="true"
+        class="hairline absolute left-32 top-3 bottom-3 hidden w-px lg:block"
+      >
+      </div>
+
+      <div class="flex flex-col gap-20 sm:gap-28">
+        {
+          napriamy.map((n) => (
+            <article
+              id={n.id}
+              class="reveal relative scroll-mt-24 lg:pl-[10.5rem]"
+            >
+              {/* Година на рейці */}
+              <div
+                class="mb-5 flex items-baseline gap-3 lg:absolute lg:left-0 lg:top-0 lg:mb-0 lg:w-32 lg:justify-end"
+              >
+                <time
+                  datetime={n.timeFrom}
+                  class="font-display text-clock font-medium text-ink"
+                >
+                  {n.time}
+                </time>
+                <span class="font-sans text-eyebrow uppercase text-taupe lg:hidden">
+                  {n.timeFrom}–{n.timeTo}
+                </span>
+              </div>
+              <span
+                aria-hidden="true"
+                class="absolute left-32 top-2.5 hidden h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-copper lg:block"
+              />
+
+              <div class="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:gap-14">
+                <div>
+                  <h3 class="text-h3 font-display font-medium text-ink">
+                    {n.title}
+                  </h3>
+                  <p class="mt-2 font-sans text-small text-taupe">
+                    <span class="hidden lg:inline">
+                      {n.timeFrom}–{n.timeTo} &#183;{" "}
+                    </span>
+                    90 хвилин &#183; {n.limit}
+                  </p>
+
+                  <div class="mt-6 flex flex-col gap-4 font-sans text-body text-ink/85">
+                    {n.paragraphs.map((p) => (
+                      <p>{p}</p>
+                    ))}
+                  </div>
+
+                  <p class="mt-8 font-sans text-small font-medium text-ink">
+                    {n.fitTitle}
+                  </p>
+                  <ul class="mt-3 flex flex-col gap-2">
+                    {n.fit.map((item) => (
+                      <li class="flex gap-3 font-sans text-body text-ink/85">
+                        <span aria-hidden="true" class="mt-2.5 h-px w-4 shrink-0 bg-copper" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {n.aside && (
+                    <p class="mt-8 border-l-2 border-copper/40 pl-5 font-display text-[1.0625rem] italic text-taupe">
+                      {n.aside}
+                    </p>
+                  )}
+
+                  {n.note && (
+                    <p class="mt-8 bg-paper-warm p-5 font-sans text-small text-taupe">
+                      {n.note.text}{" "}
+                      <a
+                        href={n.note.href}
+                        target="_blank"
+                        rel="noopener"
+                        class="text-ink underline decoration-copper decoration-1 underline-offset-4 hover:text-copper"
+                      >
+                        {n.note.linkLabel}
+                      </a>
+                    </p>
+                  )}
+
+                  <Cta
+                    source={n.source}
+                    napriam={n.id}
+                    label={n.ctaLabel}
+                    class="mt-9"
+                  />
+                </div>
+
+                <figure class="lg:pt-1">
+                  <Image
+                    src={images[n.id]!}
+                    alt={alts[n.id]!}
+                    widths={[400, 640, 960]}
+                    sizes="(min-width: 1024px) 20rem, 100vw"
+                    format="avif"
+                    loading="lazy"
+                    class="w-full object-cover"
+                  />
+                </figure>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

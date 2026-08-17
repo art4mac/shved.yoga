@@ -1,0 +1,58 @@
+---
+import { faq, pered } from "../content/site";
+---
+
+<section class="bg-paper-warm py-20 sm:py-28">
+  <div
+    class="mx-auto grid max-w-[78rem] gap-14 px-5 sm:px-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)] lg:gap-20"
+  >
+    <div class="reveal">
+      <p class="font-sans text-eyebrow uppercase text-copper">{pered.eyebrow}</p>
+      <h2 class="mt-4 text-h2 font-display font-medium text-ink">
+        {pered.title}
+      </h2>
+      <ul class="mt-7 flex flex-col gap-4">
+        {
+          pered.items.map((item) => (
+            <li class="flex gap-3 font-sans text-body text-ink/85">
+              <span aria-hidden="true" class="mt-2.5 h-px w-4 shrink-0 bg-copper" />
+              <span>{item}</span>
+            </li>
+          ))
+        }
+      </ul>
+      {
+        pered.matsProvided && (
+          <p class="mt-6 font-sans text-small text-taupe">{pered.matsText}</p>
+        )
+      }
+    </div>
+
+    <div class="reveal">
+      <p class="font-sans text-eyebrow uppercase text-copper">Часті запитання</p>
+      <ul class="mt-6 border-t border-taupe/25">
+        {
+          faq.map((item) => (
+            <li class="border-b border-taupe/25">
+              <details class="group">
+                <summary
+                  class="flex cursor-pointer list-none items-start justify-between gap-6 py-5 font-display text-[1.0625rem] font-medium text-ink marker:hidden sm:text-[1.125rem]"
+                >
+                  {item.q}
+                  <span
+                    aria-hidden="true"
+                    class="mt-1 shrink-0 text-copper transition-transform duration-200 group-open:rotate-45"
+                    >+</span
+                  >
+                </summary>
+                <p class="pb-6 pr-10 font-sans text-body text-ink/80">
+                  {item.a}
+                </p>
+              </details>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

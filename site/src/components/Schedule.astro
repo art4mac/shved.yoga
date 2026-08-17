@@ -1,0 +1,71 @@
+---
+import { rozklad, napriamy } from "../content/site";
+import Cta from "./Cta.astro";
+
+/**
+ * Розклад і вартість разом. Рішення про купівлю ухвалюється один раз,
+ * тому час, місця й ціна мусять бути в одному місці сторінки.
+ */
+---
+
+<section id="rozklad" class="scroll-mt-20 bg-ink py-20 text-paper sm:py-28">
+  <div class="mx-auto max-w-[78rem] px-5 sm:px-8">
+    <header class="reveal max-w-[34ch]">
+      <p class="font-sans text-eyebrow uppercase text-copper">
+        {rozklad.eyebrow}
+      </p>
+      <h2 class="mt-4 text-h2 font-display font-medium text-paper">
+        {rozklad.title}
+      </h2>
+      <p class="mt-6 max-w-[48ch] font-sans text-body text-paper/70">
+        {rozklad.lead}
+      </p>
+    </header>
+
+    <!-- Час -->
+    <ul class="reveal mt-14 grid gap-px overflow-hidden bg-paper/15 sm:grid-cols-2">
+      {
+        napriamy.map((n) => (
+          <li class="bg-ink p-7 sm:p-9">
+            <time
+              datetime={n.timeFrom}
+              class="font-display text-h3 font-medium text-paper"
+            >
+              {n.timeFrom}&#8202;–&#8202;{n.timeTo}
+            </time>
+            <p class="mt-2.5 font-sans text-body text-paper/85">{n.title}</p>
+            <p class="mt-1 font-sans text-small text-paper/55">
+              90 хвилин &#183; {n.limit}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <!-- Ціна -->
+    <ul class="reveal mt-12 grid gap-px overflow-hidden bg-paper/15 lg:grid-cols-3">
+      {
+        rozklad.prices.map((p) => (
+          <li class="flex flex-col bg-ink p-7 sm:p-9">
+            <p class="font-sans text-eyebrow uppercase text-paper/55">
+              {p.title}
+            </p>
+            <p class="mt-4 font-display text-h3 font-medium text-copper">
+              {p.price}
+            </p>
+            <p class="mt-4 font-sans text-small text-paper/70">{p.note}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="reveal mt-10 max-w-[58ch] font-sans text-small text-paper/70">
+      {rozklad.gift}
+    </p>
+
+    <!-- Підпис під кнопкою на темному тлі: taupe тут не читається. -->
+    <div class="reveal mt-11 [&_span.text-taupe]:text-paper/60">
+      <Cta source="price" withNote />
+    </div>
+  </div>
+</section>
