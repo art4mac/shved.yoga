@@ -158,6 +158,18 @@
 
 starlette-admin на `/admin` того же домена, одна на бота и на сайт. Вход по `administrators`, пароли хешированные. Обязательно: `Disallow: /admin` в `robots.txt`, `noindex` в ответах, ограничение частоты запросов на Traefik. Контент сайта в админку **не** выносится — он живёт в репозитории и правится через git.
 
+## Деплой на тестовый хост
+
+Задеплоено: **https://shved-yoga.dev.coventpro.ai** — стек `dev-shved-yoga` (id 73) в Portainer на endpoint `primary`, git-стек с `https://github.com/art4mac/shved.yoga.git`, ветка `main`, compose `docker-compose.dev.yml`. Редеплой — «Pull and redeploy» в Portainer после пуша.
+
+Стек повторяет соседний клиентский `dev-olenapikhulia`: one-shot `content-sync` кладёт вмест в `/var/www/vhosts/<host>`, `nginx:1.27-alpine` отдаёт его `:ro`, конфиг лежит в `/home/docker/infra/volumes/dev-shved-yoga/`, сеть `coventit-net`, пин `traefik.docker.network`, роутер `websecure` с `letsencrypt`, лимиты 0.25 CPU и 64 МБ.
+
+**Единственное отличие от канона:** в репозитории лежит не готовая статика, а источник Astro, поэтому `content-sync` сначала собирает сайт (`deploy/Dockerfile`, node → alpine с rsync). `SITE_URL` передаётся build-аргументом, потому что Astro запекает canonical, og:url и sitemap на этапе сборки.
+
+Конфиг nginx для деплоя отдельный (`deploy/nginx.conf`): стоковый nginx слушает 80, локальный образ — nginx-unprivileged на 8080. Правила `try_files` не SPA-шные, `error_page 404 /404.html` со статусом 404.
+
+Проверено после публикации: HTTP/2 200, сертификат Let's Encrypt до 7 ноября 2026, `/privacy`, `/robots.txt`, `/sitemap-index.xml` и видео отдаются, несуществующий адрес даёт 404, `http` редиректит на `https` кодом 301, canonical и og:url указывают на реальный хост.
+
 ## Инфраструктура
 
 Стек `${ENVIRONMENT}-shved-yoga` по конвенциям Covent AI, все переменные в корневом `.env`, `ENVIRONMENT` из `local|dev|prod`.
