@@ -1,0 +1,14 @@
+# База = локальне середовище: `docker compose up -d` працює без додаткових файлів.
+# dev/prod підключаються через COMPOSE_FILE у кореневому .env і містять лише дельти.
+services:
+  site:
+    build:
+      context: ./site
+      args:
+        SITE_URL: ${SITE_URL}
+        PUBLIC_BOT_URL: ${PUBLIC_BOT_URL}
+        PUBLIC_GA4_ID: ${PUBLIC_GA4_ID:-}
+    image: ${SITE_IMAGE:-shved-yoga-site:local}
+    ports:
+      - "${SITE_PORT:-8080}:8080"
+    restart: unless-stopped
