@@ -1,9 +1,11 @@
 ---
-import { Image } from "astro:assets";
+import { getImage } from "astro:assets";
 import { hero, bot } from "../content/site";
 
 import hathaHero from "../assets/photos/hatha-hero.png";
 import prasuHero from "../assets/photos/prasu-hero.png";
+import hathaMobile from "../assets/photos/hatha-hero-mobile.png";
+import prasuMobile from "../assets/photos/prasu-hero-mobile.png";
 
 /**
  * Слайдер напрямів.
@@ -19,10 +21,42 @@ import prasuHero from "../assets/photos/prasu-hero.png";
  *
  * Кадри беруться цілими, рамку задає лише `object-fit`.
  */
-const sources: Record<string, ImageMetadata> = {
+const wideSources: Record<string, ImageMetadata> = {
   hatha: hathaHero,
   prasu: prasuHero,
 };
+
+/**
+ * Для вузьких екранів свої кадри: широкий банер там показував смужку без
+ * людини. У мобільних кадрах фігура по центру й унизу, а вгорі є запас, куди
+ * лягають тексти.
+ */
+const mobileSources: Record<string, ImageMetadata> = {
+  hatha: hathaMobile,
+  prasu: prasuMobile,
+};
+
+const media = await Promise.all(
+  hero.slides.map(async (slide) => ({
+    id: slide.id,
+    focus: slide.focus,
+    wide: await getImage({
+      src: wideSources[slide.id]!,
+      widths: [900, 1400, 1920, 2560],
+      format: "avif",
+    }),
+    mobile: await getImage({
+      src: mobileSources[slide.id]!,
+      widths: [430, 640, 860, 1080],
+      format: "avif",
+    }),
+    fallback: await getImage({
+      src: wideSources[slide.id]!,
+      width: 1400,
+      format: "jpeg",
+    }),
+  })),
+);
 
 const first = hero.slides[0]!;
 ---
@@ -33,26 +67,40 @@ const first = hero.slides[0]!;
   data-tone={first.tone}
   aria-roledescription="слайдер напрямів"
 >
-  <!-- Шар знімків -->
+  <!-- Шар знімків. <picture> замість <Image>, бо кадр залежить від ширини
+       екрана: до sm — вертикальний мобільний кроп, від sm — широкий банер. -->
   {
-    hero.slides.map((slide, i) => (
+    media.map((m, i) => (
       <div
-        data-media={slide.id}
+        data-media={m.id}
         data-active={i === 0 ? "" : null}
         aria-hidden="true"
         class="absolute inset-0"
       >
-        <Image
-          src={sources[slide.id]!}
-          alt=""
-          widths={[900, 1400, 1920, 2560]}
-          sizes="100vw"
-          format="avif"
-          loading={i === 0 ? "eager" : "lazy"}
-          decoding={i === 0 ? "sync" : "async"}
-          style={`--focus:${slide.focus}`}
-          class="h-full w-full object-cover object-[var(--focus)]"
-        />
+        <picture>
+          <source
+            media="(max-width: 639px)"
+            type="image/avif"
+            srcset={m.mobile.srcSet.attribute}
+            sizes="100vw"
+          />
+          <source
+            media="(min-width: 640px)"
+            type="image/avif"
+            srcset={m.wide.srcSet.attribute}
+            sizes="100vw"
+          />
+          <img
+            src={m.fallback.src}
+            alt=""
+            width={m.fallback.attributes.width}
+            height={m.fallback.attributes.height}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding={i === 0 ? "sync" : "async"}
+            style={`--focus:${m.focus}`}
+            class="h-full w-full object-cover object-center sm:object-[var(--focus)]"
+          />
+        </picture>
       </div>
     ))
   }
@@ -81,11 +129,18 @@ const first = hero.slides[0]!;
           data-active={i === 0 ? "" : null}
           data-tone={slide.tone}
           class:list={[
-            "hero-copy absolute max-w-[15ch] text-display font-display font-medium tracking-tight",
+            // База — мобільна: назва по центру над фігурою.
+            // inset-x + mx-auto, а НЕ left-1/2 + translate: у абсолютного блока
+            // з одним лише left доступна ширина = половина контейнера, і на 390px
+            // рядок ламався по дефісу («Прасу-» / «йога для»).
+            "hero-copy absolute inset-x-5 top-[17%] mx-auto max-w-[15ch] text-center text-display font-display font-medium tracking-tight",
+            // Індивідуальне місце напряму — лише від sm.
             slide.align === "left"
-              ? "left-5 text-left sm:left-8"
-              : "left-1/2 -translate-x-1/2 text-center",
-            slide.vAlign === "quarter" ? "top-[25%]" : "top-1/2 -translate-y-1/2",
+              ? "sm:inset-x-auto sm:left-8 sm:mx-0 sm:text-left"
+              : "sm:inset-x-8",
+            slide.vAlign === "quarter"
+              ? "sm:top-[25%]"
+              : "sm:top-[40%] sm:-translate-y-1/2",
           ]}
         >
           {slide.title}

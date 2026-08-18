@@ -5,8 +5,10 @@ import Cta from "./Cta.astro";
 import cutout from "../assets/photos/intro-cutout.png";
 
 /**
- * Знайомство. Вирізана фігура стоїть тлом унизу, зсунута праворуч на 20%
- * ширини секції, і видна цілком — правий край кадру рівно на межі екрана.
+ * Знайомство. Від md вирізана фігура стоїть тлом, зсунута праворуч, і видна
+ * цілком — правий край кадру рівно на межі екрана. На вузькому екрані тло
+ * поруч із текстом не вміщається, тому там кадр іде у звичайному потоці: по
+ * центру, над привітанням.
  *
  * Нічого поверх кадру не лежить: ні маски, ні підкладки. Тому текст мусить
  * розходитися з фігурою по вертикалі, а не накриватися нею — звідси великий
@@ -17,17 +19,17 @@ import cutout from "../assets/photos/intro-cutout.png";
 <section
   class="relative isolate overflow-hidden bg-paper py-20 sm:py-28"
 >
-  <!-- Кадр віддзеркалено засобами CSS, без другого файлу, і поставлено на
-       рівень початку тексту: верх кадру = верх заголовка. -->
+  <!-- Від md кадр віддзеркалено засобами CSS, без другого файлу, і поставлено
+       на рівень початку тексту: верх кадру = верх заголовка. -->
   <div
     aria-hidden="true"
-    class="pointer-events-none absolute top-20 right-[6%] hidden w-[46%] -scale-x-100 md:block sm:top-28"
+    class="pointer-events-none relative mx-5 mb-6 w-auto md:absolute md:top-28 md:right-[6%] md:mx-0 md:mb-0 md:w-[46%] md:-scale-x-100"
   >
     <Image
       src={cutout}
       alt=""
       widths={[420, 640, 900]}
-      sizes="40vw"
+      sizes="(max-width: 767px) 90vw, 40vw"
       format="webp"
       loading="lazy"
       class="h-auto w-full object-contain"

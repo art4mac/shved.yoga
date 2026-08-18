@@ -32,8 +32,10 @@ const mapHref = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
           playsinline
           preload="metadata"
         >
-          <source src="/video/zal20-square.webm" type="video/webm" />
+          <!-- mp4 ПЕРШИМ: браузер бере перший придатний <source>, а Safari на
+               iOS не грає VP9/Opus у WebM — із webm попереду відео там мовчало. -->
           <source src="/video/zal20-square.mp4" type="video/mp4" />
+          <source src="/video/zal20-square.webm" type="video/webm" />
         </video>
 
         <h2 class="text-h2 font-display font-medium text-ink">
