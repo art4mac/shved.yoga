@@ -24,14 +24,14 @@ const icons = Object.entries(files)
   .map(([path, svg]) => ({ id: path.split("/").pop()!.replace(".svg", ""), svg }));
 ---
 
-<div class="border-y border-taupe/15 bg-greige/45" aria-hidden="true">
+<div class="border-y border-taupe/15 bg-paper" aria-hidden="true">
   <ul
     data-silhouettes
-    class="mx-auto grid max-w-[78rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-5 sm:gap-y-4 lg:gap-x-8 sm:px-8 sm:py-9"
+    class="mx-auto grid max-w-[96rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 sm:flex sm:justify-between sm:gap-x-0 sm:px-8 sm:py-9"
   >
     {
       icons.map((icon) => (
-        <li data-glyph class="glyph w-10 sm:w-12" set:html={icon.svg} />
+        <li data-glyph class="glyph w-10 md:w-12 lg:w-14" set:html={icon.svg} />
       ))
     }
   </ul>
@@ -55,15 +55,12 @@ const icons = Object.entries(files)
     color: var(--idle);
     /* Погасання довге, розпалювання швидке — саме ця різниця й дає шлейф за
        курсором: пройдені іконки ще світяться, коли мишка вже далі. */
-    transition:
-      color 1100ms cubic-bezier(0.33, 0, 0.67, 1),
-      translate 750ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: color 1100ms cubic-bezier(0.33, 0, 0.67, 1);
   }
 
   .glyph[data-lit] {
     color: var(--chakra, var(--color-copper));
-    translate: 0 -3px;
-    transition-duration: 90ms, 240ms;
+    transition-duration: 90ms;
   }
 
   .glyph :global(svg) {
@@ -100,11 +97,9 @@ const icons = Object.entries(files)
   @media (prefers-reduced-motion: reduce) {
     .glyph {
       transition: color 400ms linear;
-      translate: none;
     }
 
     .glyph[data-lit] {
-      translate: none;
       transition-duration: 120ms;
     }
   }
