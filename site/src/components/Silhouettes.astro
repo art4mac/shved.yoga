@@ -6,8 +6,9 @@
  * на fill і stroke. Самі файли не правимо — CSS перебиває презентаційні
  * атрибути `fill="#000"` та `stroke="none"` зі svg.
  *
- * Штрих обов'язковий: контур у цих файлах тонший за піксель, і без обведення
- * силуети зникають (та сама історія, що зі знаком у шапці).
+ * Обведення засобами CSS не потрібне: у цьому наборі товстий контур уже
+ * запечений у заливку. Попередній набір був іншим — там контур був тонший за
+ * піксель, і без штриха силуети зникали.
  *
  * Порядок іконок перемішує скрипт при кожному завантаженні, а колір чакри
  * призначається вже за кінцевим місцем у рядку — щоб полоса читалася знизу
@@ -21,17 +22,22 @@ const files = import.meta.glob<string>("../assets/silhouettes/*.svg", {
 
 const icons = Object.entries(files)
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([path, svg]) => ({ id: path.split("/").pop()!.replace(".svg", ""), svg }));
+  .map(([path, svg]) => ({
+    id: path.split("/").pop()!.replace(".svg", ""),
+    // У файлах є <rect fill="white"> на всю площу — на паперовому тлі це білий
+    // квадрат навколо кожної фігури, тому підкладку прибираємо.
+    svg: svg.replace(/<rect[^>]*fill="white"[^>]*\/>\s*/i, ""),
+  }));
 ---
 
-<div class="border-y border-taupe/15 bg-paper" aria-hidden="true">
+<div class="bg-paper" aria-hidden="true">
   <ul
     data-silhouettes
-    class="mx-auto grid max-w-[96rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 sm:flex sm:justify-between sm:gap-x-0 sm:px-8 sm:py-9"
+    class="mx-auto grid max-w-[78rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 md:flex md:justify-between md:gap-x-0 sm:px-8 sm:py-10"
   >
     {
       icons.map((icon) => (
-        <li data-glyph class="glyph w-10 md:w-12 lg:w-14" set:html={icon.svg} />
+        <li data-glyph class="glyph w-12 lg:w-16 xl:w-20" set:html={icon.svg} />
       ))
     }
   </ul>
@@ -69,21 +75,10 @@ const icons = Object.entries(files)
     height: auto;
   }
 
-  /* Фарбувати треба саме нащадків, а не svg: `fill="#000"` і `stroke="none"`
-     оголошені на внутрішньому <g>, а презентаційний атрибут самого елемента
-     сильніший за успадкування від батька. Через це CSS на svg на промальовку
-     не впливав — те, що виглядало сірими лініями, було чорною заливкою
-     шириною менше пікселя. */
-  .glyph :global(svg :is(g, path)) {
+  /* Фарбувати треба сам <path>, а не svg: `fill` оголошений презентаційним
+     атрибутом на елементі, а він сильніший за успадкування від батька. */
+  .glyph :global(svg path) {
     fill: currentColor;
-    stroke: currentColor;
-    /* non-scaling-stroke: товщина рахується в екранних пікселях, тому лінія
-       однакова і на 40px, і на 48px, і на будь-якій щільності екрана. Значення
-       підібрано знімками в браузері: тонше давало рвану лінію на DPR 1. */
-    stroke-width: 1.25px;
-    vector-effect: non-scaling-stroke;
-    stroke-linejoin: round;
-    stroke-linecap: round;
   }
 
   .glyph[data-chakra="1"] { --chakra: var(--chakra-1); }
