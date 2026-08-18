@@ -1,0 +1,153 @@
+---
+/**
+ * Полоса силуетів між привітанням і напрямами.
+ *
+ * Файли вставляються інлайном (`?raw`), бо кольором керує CSS: `currentColor`
+ * на fill і stroke. Самі файли не правимо — CSS перебиває презентаційні
+ * атрибути `fill="#000"` та `stroke="none"` зі svg.
+ *
+ * Штрих обов'язковий: контур у цих файлах тонший за піксель, і без обведення
+ * силуети зникають (та сама історія, що зі знаком у шапці).
+ *
+ * Порядок іконок перемішує скрипт при кожному завантаженні, а колір чакри
+ * призначається вже за кінцевим місцем у рядку — щоб полоса читалася знизу
+ * вгору, від кореневої до тім'яної.
+ */
+const files = import.meta.glob<string>("../assets/silhouettes/*.svg", {
+  query: "?raw",
+  import: "default",
+  eager: true,
+});
+
+const icons = Object.entries(files)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, svg]) => ({ id: path.split("/").pop()!.replace(".svg", ""), svg }));
+---
+
+<div class="border-y border-taupe/15 bg-greige/45" aria-hidden="true">
+  <ul
+    data-silhouettes
+    class="mx-auto grid max-w-[78rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 sm:flex sm:flex-wrap sm:justify-center sm:gap-x-5 sm:gap-y-4 lg:gap-x-8 sm:px-8 sm:py-9"
+  >
+    {
+      icons.map((icon) => (
+        <li data-glyph class="glyph w-10 sm:w-12" set:html={icon.svg} />
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  /* Кольори чакр — локальні для цієї полоси, а не токени палітри: у системі
+     акцент один, медний, і сім кольорів не мають з неї протікати. */
+  [data-silhouettes] {
+    --chakra-1: #c8352b; /* Муладгара */
+    --chakra-2: #d9722a; /* Свадгістана */
+    --chakra-3: #cfa018; /* Маніпура */
+    --chakra-4: #2f8f5b; /* Анагата */
+    --chakra-5: #2e86c1; /* Вішудга */
+    --chakra-6: #3f4c9b; /* Аджна */
+    --chakra-7: #7b4e9e; /* Сагасрара */
+    --idle: color-mix(in oklab, var(--color-taupe) 72%, var(--color-paper));
+  }
+
+  .glyph {
+    color: var(--idle);
+    /* Погасання довге, розпалювання швидке — саме ця різниця й дає шлейф за
+       курсором: пройдені іконки ще світяться, коли мишка вже далі. */
+    transition:
+      color 1100ms cubic-bezier(0.33, 0, 0.67, 1),
+      translate 750ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glyph[data-lit] {
+    color: var(--chakra, var(--color-copper));
+    translate: 0 -3px;
+    transition-duration: 90ms, 240ms;
+  }
+
+  .glyph :global(svg) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Фарбувати треба саме нащадків, а не svg: `fill="#000"` і `stroke="none"`
+     оголошені на внутрішньому <g>, а презентаційний атрибут самого елемента
+     сильніший за успадкування від батька. Через це CSS на svg на промальовку
+     не впливав — те, що виглядало сірими лініями, було чорною заливкою
+     шириною менше пікселя. */
+  .glyph :global(svg :is(g, path)) {
+    fill: currentColor;
+    stroke: currentColor;
+    /* non-scaling-stroke: товщина рахується в екранних пікселях, тому лінія
+       однакова і на 40px, і на 48px, і на будь-якій щільності екрана. Значення
+       підібрано знімками в браузері: тонше давало рвану лінію на DPR 1. */
+    stroke-width: 1.25px;
+    vector-effect: non-scaling-stroke;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+
+  .glyph[data-chakra="1"] { --chakra: var(--chakra-1); }
+  .glyph[data-chakra="2"] { --chakra: var(--chakra-2); }
+  .glyph[data-chakra="3"] { --chakra: var(--chakra-3); }
+  .glyph[data-chakra="4"] { --chakra: var(--chakra-4); }
+  .glyph[data-chakra="5"] { --chakra: var(--chakra-5); }
+  .glyph[data-chakra="6"] { --chakra: var(--chakra-6); }
+  .glyph[data-chakra="7"] { --chakra: var(--chakra-7); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .glyph {
+      transition: color 400ms linear;
+      translate: none;
+    }
+
+    .glyph[data-lit] {
+      translate: none;
+      transition-duration: 120ms;
+    }
+  }
+</style>
+
+<script>
+  const strip = document.querySelector<HTMLElement>("[data-silhouettes]");
+
+  if (strip) {
+    const glyphs = [...strip.querySelectorAll<HTMLElement>("[data-glyph]")];
+
+    // Випадковий порядок при кожному завантаженні (Фішер — Йетс).
+    for (let i = glyphs.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [glyphs[i]!, glyphs[j]!] = [glyphs[j]!, glyphs[i]!];
+    }
+    strip.append(...glyphs);
+
+    // Колір — за місцем у рядку, а не за файлом: сім чакр рівно розкладаються
+    // на всю полосу, тож зліва завжди коренева, справа тім'яна.
+    const CHAKRAS = 7;
+    const last = Math.max(1, glyphs.length - 1);
+    glyphs.forEach((glyph, i) => {
+      glyph.dataset.chakra = String(Math.round((i * (CHAKRAS - 1)) / last) + 1);
+    });
+
+    // Шлейф: іконка тримає колір ще трохи після того, як курсор пішов далі,
+    // а потім гасне довгим переходом із CSS.
+    const HOLD = 900;
+    const timers = new WeakMap<HTMLElement, number>();
+
+    strip.addEventListener("pointerover", (event) => {
+      const glyph = (event.target as Element | null)?.closest<HTMLElement>("[data-glyph]");
+      if (!glyph) return;
+
+      glyph.dataset.lit = "";
+      window.clearTimeout(timers.get(glyph));
+      timers.set(
+        glyph,
+        window.setTimeout(() => {
+          delete glyph.dataset.lit;
+        }, HOLD),
+      );
+    });
+  }
+</script>
