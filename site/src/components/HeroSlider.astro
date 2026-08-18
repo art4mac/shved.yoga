@@ -2,10 +2,10 @@
 import { getImage } from "astro:assets";
 import { hero, bot } from "../content/site";
 
-import hathaHero from "../assets/photos/hatha-hero.png";
-import prasuHero from "../assets/photos/prasu-hero.png";
-import hathaMobile from "../assets/photos/hatha-hero-mobile.png";
-import prasuMobile from "../assets/photos/prasu-hero-mobile.png";
+import hathaHero from "../assets/photos/hatha-hero.jpg";
+import prasuHero from "../assets/photos/prasu-hero.jpg";
+import hathaMobile from "../assets/photos/hatha-hero-mobile.jpg";
+import prasuMobile from "../assets/photos/prasu-hero-mobile.jpg";
 
 /**
  * Слайдер напрямів.
@@ -40,20 +40,26 @@ const media = await Promise.all(
   hero.slides.map(async (slide) => ({
     id: slide.id,
     focus: slide.focus,
+    // Кадри зібрані з оригіналів (3600px), тому всі ширини — це зменшення, а не
+    // розтяжка: на retina-екрані браузер отримує справжні пікселі. Якість задана
+    // явно, бо на дефолтній AVIF тиснув знімок людини до 16 кБ і мазав шкіру.
     wide: await getImage({
       src: wideSources[slide.id]!,
-      widths: [900, 1400, 1920, 2560],
+      widths: [1200, 1800, 2560, 3200],
       format: "avif",
+      quality: 78,
     }),
     mobile: await getImage({
       src: mobileSources[slide.id]!,
-      widths: [430, 640, 860, 1080],
+      widths: [480, 720, 1080, 1440],
       format: "avif",
+      quality: 78,
     }),
     fallback: await getImage({
       src: wideSources[slide.id]!,
-      width: 1400,
+      width: 1800,
       format: "jpeg",
+      quality: 82,
     }),
   })),
 );
