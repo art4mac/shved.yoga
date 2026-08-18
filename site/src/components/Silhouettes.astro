@@ -20,6 +20,14 @@ const files = import.meta.glob<string>("../assets/silhouettes/*.svg", {
   eager: true,
 });
 
+/**
+ * У рядок стає вісім іконок із дванадцяти, і вісімка щоразу інша. Усі
+ * дванадцять лишаються в розмітці: зайві приховані класом, а скрипт лише
+ * перекладає, які саме сховані. Так без JS видно перші вісім, а з JS набір
+ * змінюється без стрибка розкладки — кількість видимих не міняється.
+ */
+const VISIBLE = 8;
+
 const icons = Object.entries(files)
   .sort(([a], [b]) => a.localeCompare(b))
   .map(([path, svg]) => ({
@@ -33,11 +41,16 @@ const icons = Object.entries(files)
 <div class="bg-paper" aria-hidden="true">
   <ul
     data-silhouettes
-    class="mx-auto grid max-w-[78rem] grid-cols-6 items-end justify-items-center gap-x-2 gap-y-6 px-5 py-8 md:flex md:justify-between md:gap-x-0 sm:px-8 sm:py-10"
+    data-visible={VISIBLE}
+    class="mx-auto grid max-w-[78rem] grid-cols-4 items-end justify-items-center gap-x-3 gap-y-6 px-5 py-8 md:flex md:justify-between md:gap-x-0 sm:px-8 sm:py-10"
   >
     {
-      icons.map((icon) => (
-        <li data-glyph class="glyph w-12 lg:w-16 xl:w-20" set:html={icon.svg} />
+      icons.map((icon, i) => (
+        <li
+          data-glyph
+          class:list={["glyph w-16 lg:w-20 xl:w-26", i >= VISIBLE && "hidden"]}
+          set:html={icon.svg}
+        />
       ))
     }
   </ul>
@@ -113,11 +126,17 @@ const icons = Object.entries(files)
     }
     strip.append(...glyphs);
 
+    // Показуємо перші VISIBLE із перемішаних — звідси і випадкова вісімка,
+    // і випадковий порядок в один прохід.
+    const visibleCount = Number(strip.dataset.visible) || glyphs.length;
+    const shown = glyphs.slice(0, visibleCount);
+    glyphs.forEach((glyph, i) => glyph.classList.toggle("hidden", i >= visibleCount));
+
     // Колір — за місцем у рядку, а не за файлом: сім чакр рівно розкладаються
     // на всю полосу, тож зліва завжди коренева, справа тім'яна.
     const CHAKRAS = 7;
-    const last = Math.max(1, glyphs.length - 1);
-    glyphs.forEach((glyph, i) => {
+    const last = Math.max(1, shown.length - 1);
+    shown.forEach((glyph, i) => {
       glyph.dataset.chakra = String(Math.round((i * (CHAKRAS - 1)) / last) + 1);
     });
 
