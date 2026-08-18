@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="uk">
+  <head>
+    <meta charset="utf-8" />
+    <title>Соціальні картки</title>
+    <style>
+      @font-face {
+        font-family: "Literata";
+        src: url("/fonts/literata-display.woff2") format("woff2-variations");
+        font-weight: 450 700;
+        font-style: normal;
+      }
+      @font-face {
+        font-family: "Fixel";
+        src: url("/fonts/fixel-text-regular.woff2") format("woff2");
+        font-weight: 400;
+      }
+      @font-face {
+        font-family: "Fixel";
+        src: url("/fonts/fixel-text-medium.woff2") format("woff2");
+        font-weight: 500;
+      }
+      @font-face {
+        font-family: "Fixel";
+        src: url("/fonts/fixel-text-semibold.woff2") format("woff2");
+        font-weight: 600;
+      }
+
+      :root {
+        --paper: #f5f2ee;
+        --greige: #d9d3cb;
+        --taupe: #6e6259;
+        --ink: #1a1816;
+        --copper: #a9502e;
+      }
+
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { background: #fff; }
+
+      .card {
+        width: 1200px;
+        height: 630px;
+        display: grid;
+        grid-template-columns: 660px 540px;
+        background: var(--paper);
+        overflow: hidden;
+        font-family: "Fixel", sans-serif;
+        color: var(--ink);
+      }
+
+      .copy {
+        padding: 56px 52px 48px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .brand {
+        font-family: "Literata", serif;
+        font-weight: 500;
+        font-size: 27px;
+        letter-spacing: -0.01em;
+      }
+
+      .eyebrow {
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--taupe);
+      }
+
+      .rows { margin-top: auto; }
+
+      /* Час і назва в один рядок, як у розкладі на сайті: волосяні лінійки,
+         табличні цифри, мідний тільки на часі. */
+      .row {
+        display: flex;
+        align-items: baseline;
+        gap: 20px;
+        padding: 22px 0;
+        border-top: 1px solid rgb(110 98 89 / 0.25);
+      }
+      .row:last-child { border-bottom: 1px solid rgb(110 98 89 / 0.25); }
+
+      .time {
+        font-family: "Literata", serif;
+        font-weight: 500;
+        font-size: 34px;
+        line-height: 1;
+        color: var(--copper);
+        font-variant-numeric: tabular-nums;
+        flex: none;
+      }
+
+      .name {
+        font-family: "Literata", serif;
+        font-weight: 500;
+        font-size: 27px;
+        line-height: 1.15;
+        letter-spacing: -0.01em;
+      }
+
+      .dur {
+        margin-left: auto;
+        font-size: 15px;
+        color: var(--taupe);
+        flex: none;
+      }
+
+      .place {
+        margin-top: 26px;
+        font-size: 16px;
+        color: var(--taupe);
+      }
+
+      .shot { position: relative; }
+      .shot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+      /* --- одиночна карточка напряму: назва велика, час під нею --- */
+      .solo .lead {
+        margin-top: auto;
+        font-family: "Literata", serif;
+        font-weight: 500;
+        font-size: 54px;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        max-width: 13ch;
+      }
+      .solo .when {
+        margin-top: 26px;
+        padding-top: 22px;
+        border-top: 1px solid rgb(110 98 89 / 0.25);
+        display: flex;
+        align-items: baseline;
+        gap: 18px;
+      }
+      .solo .when .time { font-size: 40px; }
+      .solo .when .sub { font-size: 17px; color: var(--taupe); }
+
+      .promise {
+        margin-top: 34px;
+        font-family: "Literata", serif;
+        font-weight: 500;
+        font-size: 33px;
+        line-height: 1.15;
+        letter-spacing: -0.015em;
+        max-width: 17ch;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 1. Головна: обидва напрями з часом -->
+    <div class="card" id="main">
+      <div class="copy">
+        <div>
+          <p class="brand">Olha Shved Yoga</p>
+          <p class="eyebrow">Щосуботи у Львові</p>
+          <p class="promise">Йога для тілесного та емоційного задоволення</p>
+        </div>
+
+        <div class="rows">
+          <div class="row">
+            <span class="time">12:00</span>
+            <span class="name">Хатха-йога<br />для дорослих</span>
+            <span class="dur">90 хвилин</span>
+          </div>
+          <div class="row">
+            <span class="time">14:30</span>
+            <span class="name">Прасу-йога<br />для вагітних</span>
+            <span class="dur">90 хвилин</span>
+          </div>
+        </div>
+
+        <p class="place">вул. Залізнична, 20 — простір ZAL.20</p>
+      </div>
+      <div class="shot"><img src="/_og/hatha.jpg" alt="" /></div>
+    </div>
+
+    <!-- 2. Хатха-йога -->
+    <div class="card solo" id="hatha">
+      <div class="copy">
+        <div>
+          <p class="brand">Olha Shved Yoga</p>
+          <p class="eyebrow">Щосуботи у Львові</p>
+        </div>
+        <p class="lead">Хатха-йога для дорослих</p>
+        <div class="when">
+          <span class="time">12:00</span>
+          <span class="sub">до 13:30 — 90 хвилин, до 12 людей</span>
+        </div>
+        <p class="place">вул. Залізнична, 20 — простір ZAL.20</p>
+      </div>
+      <div class="shot"><img src="/_og/hatha.jpg" alt="" /></div>
+    </div>
+
+    <!-- 3. Прасу-йога -->
+    <div class="card solo" id="prasu">
+      <div class="copy">
+        <div>
+          <p class="brand">Olha Shved Yoga</p>
+          <p class="eyebrow">Щосуботи у Львові</p>
+        </div>
+        <p class="lead">Прасу-йога для вагітних</p>
+        <div class="when">
+          <span class="time">14:30</span>
+          <span class="sub">до 16:00 — 90 хвилин, до 10 людей</span>
+        </div>
+        <p class="place">вул. Залізнична, 20 — простір ZAL.20</p>
+      </div>
+      <div class="shot"><img src="/_og/prasu.jpg" alt="" /></div>
+    </div>
+  </body>
+</html>
