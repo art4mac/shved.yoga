@@ -1,0 +1,273 @@
+---
+import { Image } from "astro:assets";
+import zal1 from "../assets/photos/zal20-1.jpg";
+import zal2 from "../assets/photos/zal20-2.jpg";
+import zal3 from "../assets/photos/zal20-3.jpg";
+
+/**
+ * Галерея простору ZAL.20 замість колишнього відео.
+ *
+ * Прокрутка — нативний scroll-snap, а не власний трансформ: так свайп на
+ * телефоні працює сам собою, без обробників жестів. Автоперемотка лише
+ * доводить смугу до наступного кадру й зупиняється, коли на неї навели, коли
+ * вкладка не активна або коли відкрито лайтбокс.
+ *
+ * Лайтбокс — нативний <dialog>: Esc, фокус і підкладка дістаються задарма,
+ * а не збираються вручну з div-ів.
+ */
+const shots = [
+  {
+    src: zal1,
+    alt: "Світла зала простору ZAL.20: деревʼяна підлога, рослини біля вікон",
+  },
+  {
+    src: zal2,
+    alt: "Зала ZAL.20 із мандалою на стіні та вільним місцем для килимків",
+  },
+  {
+    src: zal3,
+    alt: "Полиці ZAL.20 з килимками, болстерами та рослинами",
+  },
+];
+---
+
+<figure class="mb-10" data-gallery>
+  <div class="relative overflow-hidden bg-greige/40">
+    <ul
+      data-track
+      class="flex snap-x snap-mandatory overflow-x-auto scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    >
+      {
+        shots.map((shot, i) => (
+          <li id={`zal-slide-${i}`} class="w-full shrink-0 snap-center">
+            <button
+              type="button"
+              data-open={i}
+              class="group block w-full cursor-zoom-in"
+              aria-label={`Відкрити фото ${i + 1} із ${shots.length} на весь екран`}
+            >
+              <Image
+                src={shot.src}
+                alt={shot.alt}
+                widths={[600, 900, 1200, 1800]}
+                sizes="(min-width: 1024px) 38rem, 100vw"
+                format="avif"
+                quality={72}
+                loading="lazy"
+                class="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              />
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+
+  <div class="mt-3 flex items-center justify-between gap-4">
+    <figcaption class="font-sans text-small text-taupe">
+      Простір ZAL.20, де проходять заняття
+    </figcaption>
+
+    <div
+      role="tablist"
+      aria-label="Кадри простору"
+      class="flex shrink-0 items-center gap-2"
+    >
+      {
+        shots.map((_, i) => (
+          <button
+            type="button"
+            role="tab"
+            data-dot={i}
+            aria-controls={`zal-slide-${i}`}
+            aria-selected={i === 0 ? "true" : "false"}
+            aria-label={`Кадр ${i + 1}`}
+            class="h-1.5 w-6 bg-taupe/25 transition-colors aria-selected:bg-copper"
+          />
+        ))
+      }
+    </div>
+  </div>
+</figure>
+
+<dialog
+  data-lightbox
+  class="max-h-none max-w-none bg-transparent p-0 backdrop:bg-ink/97"
+  aria-label="Фото простору ZAL.20"
+>
+  <div
+    data-lightbox-backdrop
+    class="flex h-[100dvh] w-screen flex-col items-center justify-center p-4 sm:p-8"
+  >
+    <img data-lightbox-img alt="" class="max-h-[82dvh] w-auto max-w-full object-contain" />
+
+    <p
+      data-lightbox-caption
+      class="mt-4 max-w-[60ch] text-center font-sans text-small text-paper/75"
+    >
+    </p>
+
+    <div class="mt-5 flex items-center gap-2.5">
+      <button
+        type="button"
+        data-prev
+        aria-label="Попереднє фото"
+        class="border border-paper/30 px-4 py-2 font-sans text-small text-paper transition-colors hover:border-paper hover:bg-paper hover:text-ink"
+      >
+        &#8592;
+      </button>
+      <button
+        type="button"
+        data-next
+        aria-label="Наступне фото"
+        class="border border-paper/30 px-4 py-2 font-sans text-small text-paper transition-colors hover:border-paper hover:bg-paper hover:text-ink"
+      >
+        &#8594;
+      </button>
+      <button
+        type="button"
+        data-close
+        class="ml-2 border border-paper/30 px-4 py-2 font-sans text-small text-paper transition-colors hover:border-paper hover:bg-paper hover:text-ink"
+      >
+        Закрити
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  /* Тіло не має їхати під відкритим лайтбоксом. */
+  :global(body:has(dialog[data-lightbox][open])) {
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-track] {
+      scroll-behavior: auto;
+    }
+
+    [data-gallery] img {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const gallery = document.querySelector<HTMLElement>("[data-gallery]");
+  const track = gallery?.querySelector<HTMLElement>("[data-track]");
+  const dialog = document.querySelector<HTMLDialogElement>("[data-lightbox]");
+
+  if (gallery && track && dialog) {
+    const slides = [...track.querySelectorAll<HTMLElement>("li")];
+    const dots = [...gallery.querySelectorAll<HTMLButtonElement>("[data-dot]")];
+    const buttons = [...gallery.querySelectorAll<HTMLButtonElement>("[data-open]")];
+    const full = buttons.map((b) => {
+      const img = b.querySelector("img")!;
+      // Найбільший кадр із srcset: у лайтбоксі потрібен саме він, а не той,
+      // що браузер обрав під ширину слайдера.
+      const largest = (img.getAttribute("srcset") ?? "")
+        .split(",")
+        .map((part) => part.trim().split(/\s+/))
+        .filter((p) => p.length === 2)
+        .sort((a, b2) => parseInt(b2[1]!) - parseInt(a[1]!))[0]?.[0];
+      return { src: largest ?? img.src, alt: img.alt };
+    });
+
+    const img = dialog.querySelector<HTMLImageElement>("[data-lightbox-img]")!;
+    const caption = dialog.querySelector<HTMLElement>("[data-lightbox-caption]")!;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    let current = 0;
+
+    const showDot = (i: number) =>
+      dots.forEach((d, j) => d.setAttribute("aria-selected", j === i ? "true" : "false"));
+
+    const goTo = (i: number) => {
+      current = (i + slides.length) % slides.length;
+      track.scrollTo({ left: slides[current]!.offsetLeft - track.offsetLeft });
+      showDot(current);
+    };
+
+    // Позиція веде за фактичною прокруткою — рахуємо з неї, а не з таймера,
+    // інакше після свайпу крапки показують не той кадр.
+    let ticking = false;
+    track.addEventListener(
+      "scroll",
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          const i = Math.round(track.scrollLeft / track.clientWidth);
+          if (i !== current && slides[i]) {
+            current = i;
+            showDot(current);
+          }
+          ticking = false;
+        });
+      },
+      { passive: true },
+    );
+
+    dots.forEach((dot, i) => dot.addEventListener("click", () => { stop(); goTo(i); }));
+
+    // --- автоперемотка ---
+    const DELAY = 5000;
+    let timer: number | undefined;
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+    const start = () => {
+      if (timer || reduced.matches || dialog.open || document.hidden) return;
+      timer = window.setInterval(() => goTo(current + 1), DELAY);
+    };
+
+    gallery.addEventListener("pointerenter", stop);
+    gallery.addEventListener("focusin", stop);
+    gallery.addEventListener("pointerleave", start);
+    document.addEventListener("visibilitychange", () => (document.hidden ? stop() : start()));
+    reduced.addEventListener("change", () => (reduced.matches ? stop() : start()));
+    start();
+
+    // --- лайтбокс ---
+    const show = (i: number) => {
+      current = (i + full.length) % full.length;
+      img.src = full[current]!.src;
+      img.alt = full[current]!.alt;
+      caption.textContent = full[current]!.alt;
+      showDot(current);
+    };
+
+    buttons.forEach((b, i) =>
+      b.addEventListener("click", () => {
+        stop();
+        show(i);
+        dialog.showModal();
+      }),
+    );
+
+    dialog.querySelector("[data-prev]")!.addEventListener("click", () => show(current - 1));
+    dialog.querySelector("[data-next]")!.addEventListener("click", () => show(current + 1));
+    dialog.querySelector("[data-close]")!.addEventListener("click", () => dialog.close());
+
+    // Клік по вільному місцю закриває. Ловимо саму обгортку: <dialog> цілком
+    // накритий нею, тому клік у сам dialog не потрапляє ніколи.
+    dialog.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement;
+      if (target === dialog || target.hasAttribute("data-lightbox-backdrop")) dialog.close();
+    });
+
+    dialog.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") show(current + 1);
+      if (event.key === "ArrowLeft") show(current - 1);
+    });
+
+    // Після закриття смуга стає на той кадр, який дивилися, і автоперемотка
+    // повертається.
+    dialog.addEventListener("close", () => {
+      goTo(current);
+      start();
+    });
+  }
+</script>
