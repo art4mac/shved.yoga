@@ -27,11 +27,14 @@ import Cta from "./Cta.astro";
         </p>
       </header>
 
-      <!-- Час -->
+      <!-- Час. Рядок — сітка на дві колонки, а не flex-wrap: із довшою назвою
+           («Хатха-йога для початківців») час зривався на власний рядок і ліпився
+           вліво, і рядки розкладу переставали бути однаковими. Тепер назва
+           переноситься у своїй колонці, а час лишається праворуч. -->
       <ul class="reveal flex flex-col divide-y divide-paper/15 border-y border-paper/15">
         {
           napriamy.map((n) => (
-            <li class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 py-6">
+            <li class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 py-6">
               <div>
                 <p class="font-sans text-body text-paper">{n.title}</p>
                 <p class="mt-1 font-sans text-small text-paper/55">
