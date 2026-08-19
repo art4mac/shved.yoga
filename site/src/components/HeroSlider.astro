@@ -1,6 +1,6 @@
 ---
 import { getImage } from "astro:assets";
-import { hero, bot } from "../content/site";
+import { hero, bot, rozklad } from "../content/site";
 
 import hathaHero from "../assets/photos/hatha-hero.jpg";
 import prasuHero from "../assets/photos/prasu-hero.jpg";
@@ -222,6 +222,14 @@ const first = hero.slides[0]!;
         </li>
       ))
     }
+
+    {/* Дата старту — останньою і жирним: це єдиний рядок полоски, який
+        застаріє, тому він має читатися першим. Значення з `rozklad`, щоб дата
+        не жила у двох місцях. */}
+    <li class="flex items-center gap-3">
+      <span aria-hidden="true" class="text-taupe/45">&#8226;</span>
+      <span class="font-semibold text-ink">{rozklad.start}</span>
+    </li>
   </ul>
 </div>
 
@@ -308,7 +316,7 @@ const first = hero.slides[0]!;
 </style>
 
 <script>
-  import { hero, bot } from "../content/site";
+  import { hero, bot, rozklad } from "../content/site";
 
   const root = document.querySelector<HTMLElement>("[data-slider]");
   const controls = root?.querySelector<HTMLElement>("[data-slider-controls]");
